@@ -1,11 +1,17 @@
 spring:
   application:
-        name: configserver
-  profile:
+    name: configserver
+
+  profiles:
     active: native
+
   cloud:
     config:
       server:
         native:
-          search-location: classpath:/config
+          search-locations: classpath:/config
 
+server:
+  port: 8888
+
+debug: true
