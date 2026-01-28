@@ -1,0 +1,100 @@
+package com.ecommerce.orderms.service.impl;
+
+
+
+import com.ecommerce.orderms.dto.order.response.OrderItemDTO;
+import com.ecommerce.orderms.dto.order.response.OrderResponse;
+import com.ecommerce.orderms.enumclass.OrderStatus;
+import com.ecommerce.orderms.model.cart.CartItem;
+import com.ecommerce.orderms.model.order.Order;
+import com.ecommerce.orderms.model.order.OrderItem;
+import com.ecommerce.orderms.repository.CartRepository;
+import com.ecommerce.orderms.repository.OrderRepository;
+import com.ecommerce.orderms.service.OrderService;
+import jakarta.transaction.Transactional;
+import org.springframework.stereotype.Service;
+
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.Optional;
+
+@Service
+public class OrderServiceImpl implements OrderService {
+
+    private final CartRepository cartRepository;
+    private final OrderRepository orderRepository;
+
+    public OrderServiceImpl(CartRepository cartRepository, OrderRepository orderRepository) {
+        this.cartRepository = cartRepository;
+        this.orderRepository=orderRepository;
+    }
+
+    ///  MAPPER
+    private OrderResponse mapToOrderResponse(Order saveOrder) {
+        return new OrderResponse(
+                saveOrder.getId(),
+                saveOrder.getTotalAmount(),
+                saveOrder.getStatus(),
+                saveOrder.getItems().stream()
+                        .map(orderItem -> new OrderItemDTO(
+                                orderItem.getId(),
+                                orderItem.getProductId(),
+                                orderItem.getQuantity(),
+                                orderItem.getPrice(),
+                                orderItem.getPrice().multiply(new BigDecimal(orderItem.getQuantity()))
+                        )).toList(),
+                saveOrder.getCreatedAt()
+        );
+    }
+
+    @Override
+    @Transactional
+    public Optional<OrderResponse> createOrder(String userId) {
+        // Validate for cart item
+        List<CartItem> cartItems=cartRepository.findByUserId(userId);
+        if(cartItems.isEmpty()){
+            return Optional.empty();
+        }
+        // validate for user
+//        Optional<User> userOptional=userRepository.findById(Long.valueOf(userId));
+//        if(userOptional.isEmpty()){
+//            return Optional.empty();
+//        }
+//        User user=userOptional.get();
+
+        // Calculate total price
+        BigDecimal totalPrice=cartItems.stream()
+                .map(CartItem::getPrice)
+                .reduce(BigDecimal.ZERO,BigDecimal::add);
+        // Create order
+        Order order = new Order();
+        order.setUserId(userId);
+        order.setStatus(OrderStatus.CONFIRMED);
+        order.setTotalAmount(totalPrice);
+        List<OrderItem> orderItems=cartItems.stream()
+                .map(item->new OrderItem(
+                        null,
+                        item.getProductId(),
+                        item.getQuantity(),
+                        item.getPrice(),
+                        order
+                )).toList();
+        order.setItems(orderItems);
+        Order saveOrder=orderRepository.save(order);
+        // Clear the cart
+        cartRepository.deleteByUserId(userId);
+
+        return Optional.of(mapToOrderResponse(saveOrder));
+    }
+
+    @Override
+    public List<OrderResponse> getOrdersByUserId(String userId) {
+        return orderRepository.findByUserId(userId)
+                .stream()
+                .map(this::mapToOrderResponse)
+                .toList();
+    }
+
+
+
+}
