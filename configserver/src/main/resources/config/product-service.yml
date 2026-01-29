@@ -31,3 +31,7 @@ management:
   endpoint:
     shutdown:
       enabled: true
+
+
+app:
+  message: "Hello Product ms"

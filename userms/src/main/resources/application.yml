@@ -1,7 +1,14 @@
 spring:
   application:
     name: user-service
-  config: optional:configserver:http://localhost:8888
+  config:
+    import: optional:configserver:http://localhost:8888
+
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
 
   datasource:
     mongodb:
@@ -22,3 +29,7 @@ management:
   endpoint:
     shutdown:
       enabled: true
+
+
+#app:
+#  message: "Hello"

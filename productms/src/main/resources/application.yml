@@ -1,7 +1,14 @@
 spring:
   application:
     name: product-service
-  config: optional:configserver:http://localhost:8888
+  config:
+    import: optional:configserver:http://localhost:8888
+
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
 
   datasource:
     url: jdbc:postgresql://localhost:5432/productdb
@@ -35,3 +42,7 @@ management:
   endpoint:
     shutdown:
       enabled: true
+
+#
+#app:
+#  message: "Hello "

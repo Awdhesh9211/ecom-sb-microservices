@@ -43,13 +43,6 @@ management:
     shutdown:
       enabled: true
 
-#logging:
-#  level:
-#    org.springdoc: DEBUG
+app:
+  message: "Hello Order ms"
 
-#springdoc:
-#  api-docs:
-#    path: /api-docs
-#  swagger-ui:
-#    path: /swagger-ui.html
-#    operationsSorter: method
