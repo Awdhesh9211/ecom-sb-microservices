@@ -1,5 +1,6 @@
 package com.ecommerce.productms.repository;
 
+import aj.org.objectweb.asm.commons.Remapper;
 import com.ecommerce.productms.model.Product;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -25,4 +26,5 @@ public interface ProductRepository extends JpaRepository<Product,Long> {
 """)
     List<Product> searchProducts(@Param("keyword") String keyword);
 
+    Optional<Product> findByIdAndActiveTrue(Long id);
 }

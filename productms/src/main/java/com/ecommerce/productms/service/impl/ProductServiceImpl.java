@@ -99,7 +99,7 @@ public class ProductServiceImpl implements ProductService {
       }
        //GET PRODUCT BY ID
        public Optional<ProductResponse> getProduct(Long id){
-           return productRepository.findById(id)
+           return productRepository.findByIdAndActiveTrue(id)
                    .map(u->mapToProductResponse(u));
        }
 

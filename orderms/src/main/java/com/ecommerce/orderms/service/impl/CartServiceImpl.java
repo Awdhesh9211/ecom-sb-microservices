@@ -1,7 +1,9 @@
 package com.ecommerce.orderms.service.impl;
 
+import com.ecommerce.orderms.clients.productclient.ProductServiceClient;
 import com.ecommerce.orderms.dto.cart.request.CartItemRequest;
 import com.ecommerce.orderms.dto.cart.response.CartItemResponse;
+import com.ecommerce.orderms.dto.product.ProductResponse;
 import com.ecommerce.orderms.model.cart.CartItem;
 import com.ecommerce.orderms.repository.CartRepository;
 import com.ecommerce.orderms.service.CartService;
@@ -9,15 +11,18 @@ import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
 public class CartServiceImpl implements CartService {
 
     private final CartRepository cartRepository;
+    private final ProductServiceClient productServiceClient;
 
-    public CartServiceImpl(CartRepository cartRepository) {
+    public CartServiceImpl(CartRepository cartRepository,ProductServiceClient productServiceClient) {
         this.cartRepository = cartRepository;
+        this.productServiceClient=productServiceClient;
     }
 
     /* ---------------- Mapper -----------------------*/
@@ -55,12 +60,18 @@ public class CartServiceImpl implements CartService {
     @Transactional
     public boolean addToCart(String userId, CartItemRequest request) {
 
-//        Long uid;
-//        try {
-//            uid = Long.valueOf(userId);
-//        } catch (NumberFormatException e) {
-//            return false;
-//        }
+           // Look For product
+        ProductResponse productResponse=productServiceClient.getProductDetails(Long.valueOf(request.getProductId()));
+
+        if(productResponse == null ) return false;
+
+        if(productResponse.getStockQuantity() < request.getQuantity()) return false;
+
+
+
+
+
+
 
 //        Optional<User> userOpt = userRepository.findById(uid);
 //        Optional<Product> productOpt = productRepository.findById(request.getProductId());
