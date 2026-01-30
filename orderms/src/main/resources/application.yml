@@ -44,6 +44,12 @@ management:
       enabled: true
 
 
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka
+
+
 
 #  testing variable
 #app:
