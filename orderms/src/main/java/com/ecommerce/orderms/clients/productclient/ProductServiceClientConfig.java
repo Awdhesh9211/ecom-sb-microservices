@@ -1,6 +1,7 @@
 package com.ecommerce.orderms.clients.productclient;
 
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -16,9 +17,9 @@ public class ProductServiceClientConfig {
 
 
     @Bean
-    public ProductServiceClient restClientInterface(RestClient.Builder builder){
+    public ProductServiceClient productServiceClient( @Qualifier("loadBalancedRestClientBuilder") RestClient.Builder restClientBuilder){
 
-       RestClient restClient= builder
+       RestClient restClient= restClientBuilder
                .baseUrl("http://product-service")
                .defaultStatusHandler(
                        HttpStatusCode::is4xxClientError,

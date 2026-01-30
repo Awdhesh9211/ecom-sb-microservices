@@ -19,13 +19,6 @@ public class CartItem {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-//    @ManyToOne
-//    @JoinColumn(name = "user_id",nullable = false)
-//    private User user;
-//    @ManyToOne
-//    @JoinColumn(name="product_id",nullable = false)
-//    private Product product;
-    // IN MICROSERVICES WE change it to userId and productId
     private  String userId;
     private String productId;
 

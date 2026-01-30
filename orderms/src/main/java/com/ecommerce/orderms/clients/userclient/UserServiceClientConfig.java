@@ -1,7 +1,7 @@
 package com.ecommerce.orderms.clients.userclient;
 
 
-import com.ecommerce.orderms.clients.productclient.ProductServiceClient;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatusCode;
@@ -16,9 +16,9 @@ public class UserServiceClientConfig {
 
 
     @Bean
-    public UserServiceClient restClientInterface(RestClient.Builder builder){
+    public UserServiceClient userServiceClientInterface( @Qualifier("loadBalancedRestClientBuilder") RestClient.Builder restClientBuilder){
 
-        RestClient restClient= builder
+        RestClient restClient= restClientBuilder
                 .baseUrl("http://user-service")
                 .defaultStatusHandler(
                         HttpStatusCode::is4xxClientError,
