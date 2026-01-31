@@ -4,6 +4,8 @@ package com.ecommerce.userms.controller;
 import com.ecommerce.userms.dto.request.UserRequest;
 import com.ecommerce.userms.dto.response.UserResponse;
 import com.ecommerce.userms.service.UserService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,6 +19,7 @@ public class UserController {
 
    //AUTO WIRING OF SERVICES
     private final UserService userService;
+    private  static Logger logger= LoggerFactory.getLogger(UserController.class);
 
     public UserController(UserService userService) {
         this.userService = userService;
@@ -37,6 +40,12 @@ public class UserController {
 
    @GetMapping("/{id}")
     public ResponseEntity<UserResponse> getUserById(@PathVariable String  id){
+     logger.trace("Req recieved ");
+     logger.debug("debug start");
+     logger.info("user id: {}",id);
+     logger.warn("i want to find the id ");
+     logger.error("id incorrect");
+
      return userService.getUser(id)
                .map(ResponseEntity::ok)
                .orElseGet(()->ResponseEntity.notFound().build());

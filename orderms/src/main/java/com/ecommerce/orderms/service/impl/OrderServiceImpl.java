@@ -2,8 +2,10 @@ package com.ecommerce.orderms.service.impl;
 
 
 
+import com.ecommerce.orderms.clients.userclient.UserServiceClient;
 import com.ecommerce.orderms.dto.order.response.OrderItemDTO;
 import com.ecommerce.orderms.dto.order.response.OrderResponse;
+import com.ecommerce.orderms.dto.user.response.UserResponse;
 import com.ecommerce.orderms.enumclass.OrderStatus;
 import com.ecommerce.orderms.model.cart.CartItem;
 import com.ecommerce.orderms.model.order.Order;
@@ -12,6 +14,7 @@ import com.ecommerce.orderms.repository.CartRepository;
 import com.ecommerce.orderms.repository.OrderRepository;
 import com.ecommerce.orderms.service.OrderService;
 import jakarta.transaction.Transactional;
+import org.apache.catalina.User;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -23,10 +26,12 @@ public class OrderServiceImpl implements OrderService {
 
     private final CartRepository cartRepository;
     private final OrderRepository orderRepository;
+    private final UserServiceClient userServiceClient;
 
-    public OrderServiceImpl(CartRepository cartRepository, OrderRepository orderRepository) {
+    public OrderServiceImpl(CartRepository cartRepository, OrderRepository orderRepository,UserServiceClient userServiceClient) {
         this.cartRepository = cartRepository;
         this.orderRepository=orderRepository;
+        this.userServiceClient=userServiceClient;
     }
 
     ///  MAPPER
@@ -55,12 +60,10 @@ public class OrderServiceImpl implements OrderService {
         if(cartItems.isEmpty()){
             return Optional.empty();
         }
-        // validate for user
-//        Optional<User> userOptional=userRepository.findById(Long.valueOf(userId));
-//        if(userOptional.isEmpty()){
-//            return Optional.empty();
-//        }
-//        User user=userOptional.get();
+
+        UserResponse user=userServiceClient.getUserDetails(userId);
+        if(user == null) return Optional.empty();
+
 
         // Calculate total price
         BigDecimal totalPrice=cartItems.stream()
