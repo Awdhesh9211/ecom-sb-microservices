@@ -19,16 +19,21 @@ eureka:
     register-with-eureka: true
 
 management:
+  health:
+    circuitbreakers:
+      enabled: true
   endpoints:
     web:
       exposure:
         include: "*"
   endpoint:
-    gateway:
+    shutdown:
       enabled: true
+    health:
+      show-details: always
   tracing:
     sampling:
-      probability: 1.0
+      probability: 1.0   # 100% sampling (use lower in prod)
   zipkin:
     tracing:
       endpoint: http://localhost:9411/api/v2/spans

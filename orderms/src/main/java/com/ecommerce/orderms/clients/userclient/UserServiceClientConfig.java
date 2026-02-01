@@ -20,9 +20,9 @@ public class UserServiceClientConfig {
 
         RestClient restClient= restClientBuilder
                 .baseUrl("http://user-service")
-                .defaultStatusHandler(
-                        HttpStatusCode::is4xxClientError,
-                        (req,res)-> Optional.empty())
+//                .defaultStatusHandler(
+//                        HttpStatusCode::is4xxClientError,
+//                        (req,res)-> Optional.empty())
                 .build();
         RestClientAdapter adapter=RestClientAdapter
                 .create(restClient);

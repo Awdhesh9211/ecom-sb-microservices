@@ -9,7 +9,10 @@ import com.ecommerce.orderms.dto.user.response.UserResponse;
 import com.ecommerce.orderms.model.cart.CartItem;
 import com.ecommerce.orderms.repository.CartRepository;
 import com.ecommerce.orderms.service.CartService;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import jakarta.transaction.Transactional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -23,6 +26,7 @@ public class CartServiceImpl implements CartService {
     private final CartRepository cartRepository;
     private final ProductServiceClient productServiceClient;
     private final UserServiceClient userServiceClient;
+    private final Logger logger=LoggerFactory.getLogger(CartServiceImpl.class);
 
     public CartServiceImpl(CartRepository cartRepository,ProductServiceClient productServiceClient,UserServiceClient userServiceClientInterface) {
         this.cartRepository = cartRepository;
@@ -61,31 +65,67 @@ public class CartServiceImpl implements CartService {
 
     /* ---------------- ADD TO CART ---------------- */
 
+    // Resillience Logic
+    @CircuitBreaker(name = "productService", fallbackMethod = "productFallback")
+    public ProductResponse fetchProduct(Long productId) {
+        try {
+            return productServiceClient.getProductDetails(productId);
+        } catch (Exception ex) {
+            throw new RuntimeException("PRODUCT_SERVICE_DOWN");
+        }
+    }
+
+    public ProductResponse productFallback(Long productId, Exception ex) {
+        logger.error("Product service down for product {}", productId);
+        throw new RuntimeException("PRODUCT_SERVICE_DOWN");
+    }
+
+    @CircuitBreaker(name = "userService", fallbackMethod = "userFallback")
+    public UserResponse fetchUser(String userId) {
+        try {
+            return userServiceClient.getUserDetails(userId);
+        } catch (Exception ex) {
+            throw new RuntimeException("USER_SERVICE_DOWN");
+        }
+    }
+
+    public UserResponse userFallback(String userId, Exception ex) {
+        logger.error("User service down for user {}", userId);
+        throw new RuntimeException("USER_SERVICE_DOWN");
+    }
+
+
+
+
     @Override
     @Transactional
-    public boolean addToCart(String userId, CartItemRequest request) {
+    public Optional<CartItem> addToCart(String userId, CartItemRequest request) {
 
-           // Look For product
-        ProductResponse product=productServiceClient.getProductDetails(Long.valueOf(request.getProductId()));
+        // Product call (protected)
+        ProductResponse product =
+                fetchProduct(Long.valueOf(request.getProductId()));
 
-        if(product == null ) return false;
+        if (product == null) return Optional.empty();
+        if (product.getStockQuantity() < request.getQuantity()) return Optional.empty();
+        if (product.getPrice() == null) return Optional.empty();
 
-        if(product.getStockQuantity() < request.getQuantity()) return false;
+        // User call (protected)
+        UserResponse user = fetchUser(userId);
+        if (user == null) return Optional.empty();
 
-        if (product.getPrice() == null) return false;
+        CartItem cartItem =
+                cartRepository.findByUserIdAndProductId(
+                        userId, request.getProductId()
+                );
 
-          // Look For user
-        UserResponse user=userServiceClient.getUserDetails(userId);
-        if(user == null) return false;
+        int finalQuantity =
+                (cartItem == null)
+                        ? request.getQuantity()
+                        : cartItem.getQuantity() + request.getQuantity();
 
-        CartItem cartItem = cartRepository.findByUserIdAndProductId(userId, request.getProductId());
-
-        int finalQuantity = (cartItem == null)
-                ? request.getQuantity()
-                : cartItem.getQuantity() + request.getQuantity();
-
-        if (finalQuantity <= 0 || product.getStockQuantity() < finalQuantity)
-            return false;
+        if (finalQuantity <= 0 ||
+                product.getStockQuantity() < finalQuantity)
+            return Optional.empty();
 
         if (cartItem == null) {
             cartItem = new CartItem();
@@ -94,11 +134,15 @@ public class CartServiceImpl implements CartService {
         }
 
         cartItem.setQuantity(finalQuantity);
-        cartItem.setPrice(product.getPrice().multiply(BigDecimal.valueOf(finalQuantity)));
+        cartItem.setPrice(
+                product.getPrice()
+                        .multiply(BigDecimal.valueOf(finalQuantity))
+        );
 
         cartRepository.save(cartItem);
-        return true;
+        return Optional.of(cartItem);
     }
+
 
     /* ---------------- DELETE SINGLE ITEM ---------------- */
 

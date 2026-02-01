@@ -3,13 +3,17 @@ package com.ecommerce.orderms.controller;
 
 import com.ecommerce.orderms.dto.cart.request.CartItemRequest;
 import com.ecommerce.orderms.dto.cart.response.CartItemResponse;
+import com.ecommerce.orderms.model.cart.CartItem;
 import com.ecommerce.orderms.service.CartService;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/cart")
@@ -25,19 +29,54 @@ public class CartController {
     /* ---------------- ADD TO CART ---------------- */
 
     @PostMapping
-    public ResponseEntity<String> addToCart(
+    public ResponseEntity<Object> addToCart(
             @RequestHeader("X-User-ID") String userId,
             @RequestBody CartItemRequest request) {
 
-        if (!cartService.addToCart(userId, request))
-            return ResponseEntity
-                    .badRequest()
-                    .body("Product out of stock or user not found");
+        try {
+            Optional<CartItem> result = cartService.addToCart(userId, request);
+            System.out.println("Result :" + result.get());
 
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body("Added to cart");
+            if (result.isEmpty()) {
+                return ResponseEntity.badRequest()
+                        .body(Map.of(
+                                "status","FAILED",
+                                "message","Product out of stock or user not found"
+                        ));
+            }
+
+            return ResponseEntity.status(HttpStatus.CREATED)
+                    .body(Map.of(
+                            "status","SUCCESS",
+                            "message","Item added to cart"
+                    ));
+
+        } catch (Exception ex) {
+
+            LoggerFactory.getLogger(CartService.class).error(ex.getMessage());
+
+            String message;
+
+            if ("USER_SERVICE_DOWN".equals(ex.getMessage())) {
+                message = "User service temporarily unavailable";
+            }
+            else if ("PRODUCT_SERVICE_DOWN".equals(ex.getMessage())) {
+                message = "Product service temporarily unavailable";
+            }
+            else {
+                message = "Something went wrong";
+            }
+
+            return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
+                    .body(Map.of(
+                            "status","ERROR",
+                            "message", message
+                    ));
+        }
     }
+
+
+
 
     /* ---------------- UPDATE QUANTITY ---------------- */
 
