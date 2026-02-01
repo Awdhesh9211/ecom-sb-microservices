@@ -11,7 +11,7 @@ services:
       - 7946
       - 9095
     volumes:
-      - ./loki-config.yaml:/etc/loki/config.yaml
+      - "D:/18_UDEMY/SPRING_BOOT_MICROSERVICES/ecom-app-ms/evaluate-prometheus/logging/loki-config.yaml:/etc/loki/config.yaml"
     depends_on:
       - minio
     healthcheck:
@@ -32,7 +32,7 @@ services:
       - 7946
       - 9095
     volumes:
-      - ./loki-config.yaml:/etc/loki/config.yaml
+      - "D:/18_UDEMY/SPRING_BOOT_MICROSERVICES/ecom-app-ms/evaluate-prometheus/logging/loki-config.yaml:/etc/loki/config.yaml"
     healthcheck:
       test: [ "CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:3100/ready || exit 1" ]
       interval: 10s
@@ -46,9 +46,9 @@ services:
   alloy:
     image: grafana/alloy:latest
     volumes:
-      - ./alloy-local-config.yaml:/etc/alloy/config.alloy:ro
+      - "D:/18_UDEMY/SPRING_BOOT_MICROSERVICES/ecom-app-ms/evaluate-prometheus/logging/alloy-local-config.yaml:/etc/alloy/config.alloy:ro"
       - /var/run/docker.sock:/var/run/docker.sock
-      - "D:/18_UDEMY/SPRING_BOOT_MICROSERVICES/ecom-app-ms/logs:/logs-parent:ro"   #log folder
+      - "D:/18_UDEMY/SPRING_BOOT_MICROSERVICES/ecom-app-ms/logs:/logs-parent:ro"
     command:  run --server.http.listen-addr=0.0.0.0:12345 --storage.path=/var/lib/alloy/data /etc/alloy/config.alloy
     ports:
       - 12345:12345
@@ -80,6 +80,16 @@ services:
       interval: 15s
       timeout: 20s
       retries: 5
+    networks:
+      - loki
+
+  prometheus:
+    image: prom/prometheus:v2.44.0
+    container_name: prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - "D:/18_UDEMY/SPRING_BOOT_MICROSERVICES/ecom-app-ms/evaluate-prometheus/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml"
     networks:
       - loki
 
@@ -116,13 +126,15 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    volumes:
+      - "D:/18_UDEMY/SPRING_BOOT_MICROSERVICES/ecom-app-ms/evaluate-prometheus/grafana/datasources:/etc/grafana/provisioning/datasources"
     networks:
       - loki
 
   backend:
     image: grafana/loki:latest
     volumes:
-      - ./loki-config.yaml:/etc/loki/config.yaml
+      - "D:/18_UDEMY/SPRING_BOOT_MICROSERVICES/ecom-app-ms/evaluate-prometheus/logging/loki-config.yaml:/etc/loki/config.yaml"
     ports:
       - "3100"
       - "7946"
@@ -201,7 +213,24 @@ services:
       retries: 5
     networks:
       - loki
-  
+
+  zipkin:
+    image: openzipkin/zipkin:latest
+    container_name: zipkin
+    ports:
+      - "9411:9411"
+    environment:
+      - STORAGE_TYPE=mem
+      - JAVA_OPTS=-Xms512m -Xmx512m
+    healthcheck:
+      test: [ "CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:9411/health || exit 1" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - loki
+
+
 
   flog:
     image: mingrammer/flog

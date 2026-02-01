@@ -42,6 +42,12 @@ management:
   endpoint:
     shutdown:
       enabled: true
+  tracing:
+    sampling:
+      probability: 1.0   # 100% sampling (use lower in prod)
+  zipkin:
+    tracing:
+      endpoint: http://zipkin:9411/api/v2/spans
 
 eureka:
   client:
