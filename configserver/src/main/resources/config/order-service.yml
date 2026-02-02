@@ -17,18 +17,6 @@ spring:
         jdbc:
           time_zone: Asia/Kolkata
 
-#  h2:
-#    console:
-#      enabled: true
-#  datasource:
-#    url:
-#      jdbc:h2:mem:test
-#  jpa:
-#    show-sql: true
-#    hibernate:
-#      ddl-auto: create
-
-
 server:
   port: 8083
   servlet:
@@ -54,81 +42,132 @@ management:
     tracing:
       endpoint: http://zipkin:9411/api/v2/spans
 
-
 eureka:
   client:
     serviceUrl:
       defaultZone: http://localhost:8761/eureka
 
-
+# ═══════════════════════════════════════════════════════════════
+# LOGGING CONFIGURATION - Optimized for Retry Visibility
+# ═══════════════════════════════════════════════════════════════
 logging:
   level:
     root: INFO
-    com.ecommerce.userms: TRACE
+    # Your application packages
+    com.ecommerce.orderms: DEBUG
+    com.ecommerce.orderms.service.impl: DEBUG
+    com.ecommerce.orderms.controller: DEBUG
+
+    # Resilience4j - Shows retry attempts and circuit breaker state
+    io.github.resilience4j: DEBUG
+    io.github.resilience4j.retry: DEBUG
+    io.github.resilience4j.circuitbreaker: DEBUG
+
+    # HTTP client - Shows actual service calls
+    org.springframework.web.client.RestTemplate: DEBUG
+
+    # Feign client (if using Feign)
+    # feign: DEBUG
+
   file:
     name: logs/order-service.log
+    max-size: 10MB
+    max-history: 10
+
   pattern:
-    console: |
+    # Console pattern - Clean and readable
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} | %-5level | [%thread] | %logger{40} | %msg%n"
 
+    # File pattern - More detailed for debugging
+    file: "%d{yyyy-MM-dd HH:mm:ss.SSS} | %-5level | [%thread] | %logger{50} | %msg%n"
 
-      ------START--------
-      TIME  : %d{yyyy-MM-dd HH:mm:ss}
-      LEVEL : %-5level
-      PATH  : %logger
-      MSG   : %msg
-      -----END-----------
-#  testing variable
-#app:
-#  message: "hello"
-
-#logging:
-#  level:
-#    org.springdoc: DEBUG
-
-#springdoc:
-#  api-docs:
-#    path: /api-docs
-#  swagger-ui:
-#    path: /swagger-ui.html
-#    operationsSorter: method
-
+# ═══════════════════════════════════════════════════════════════
+# RESILIENCE4J CONFIGURATION - Optimized for Retry Mechanism
+# ═══════════════════════════════════════════════════════════════
 resilience4j:
+  # ─────────────────────────────────────────────────────────────
+  # RETRY CONFIGURATION
+  # ─────────────────────────────────────────────────────────────
+  retry:
+    instances:
+      retryService:
+        maxAttempts: 4
+        waitDuration: 500ms
+        retryExceptions:
+          - java.lang.IllegalStateException
+        ignoreExceptions:
+            - java.lang.RuntimeException
+        # Backoff progression: 500ms → 1000ms → 2000ms
+
+        # Retry only on specific exceptions
+#        retryExceptions:
+#          - org.springframework.web.client.ResourceAccessException
+#          - org.springframework.web.client.HttpServerErrorException
+#          - java.util.concurrent.TimeoutException
+#          - java.io.IOException
+#          - java.net.SocketTimeoutException
+#          - java.net.ConnectException
+#          - java.lang.IllegalStateException   # ← ADD THIS
+
+  # ─────────────────────────────────────────────────────────────
+  # CIRCUIT BREAKER CONFIGURATION
+  # ─────────────────────────────────────────────────────────────
   circuitbreaker:
+    configs:
+      default:
+        registerHealthIndicator: true
+        slidingWindowType: COUNT_BASED
+        slidingWindowSize: 10
+        minimumNumberOfCalls: 5
+        failureRateThreshold: 50
+        slowCallRateThreshold: 100
+        slowCallDurationThreshold: 3s
+        waitDurationInOpenState: 10s
+        permittedNumberOfCallsInHalfOpenState: 3
+        automaticTransitionFromOpenToHalfOpenEnabled: true
+
     instances:
       productService:
-        registerHealthIndicator: true
+        baseConfig: default
         slidingWindowSize: 10
         minimumNumberOfCalls: 5
         failureRateThreshold: 50
         waitDurationInOpenState: 10s
+
       userService:
-        registerHealthIndicator: true
+        baseConfig: default
         slidingWindowSize: 8
         minimumNumberOfCalls: 4
         failureRateThreshold: 50
         waitDurationInOpenState: 8s
+
+  # ─────────────────────────────────────────────────────────────
+  # TIME LIMITER CONFIGURATION
+  # ─────────────────────────────────────────────────────────────
   timelimiter:
+    configs:
+      default:
+        timeoutDuration: 3s
+        cancelRunningFuture: true
+
     instances:
       productService:
-        timeoutDuration: 2s
-      userService:
-        timeoutDuration: 2s
-  retry:
-    instances:
-      productService:
-        maxAttempts: 6
-        waitDuration: 500ms
-      userService:
-        maxAttempts: 6
-        waitDuration: 500ms
-#        recordExceptions:
-#          - org.springframework.web.client.HttpServerErrorException
-#          - java.util.concurrent.TimeoutException
-#          - java.io.IOException
-#        ignoreExceptions:
-#          - com.yourapp.exception.BusinessException
+        timeoutDuration: 3s
 
+      userService:
+        timeoutDuration: 3s
 
+# ═══════════════════════════════════════════════════════════════
+# APPLICATION PROPERTIES
+# ═══════════════════════════════════════════════════════════════
 app:
-  message: "Hello Order ms"
+  message: "Hello Order Service"
 
+  # Custom retry configuration (if needed for custom logic)
+  retry:
+    product-service:
+      max-attempts: 4
+      backoff-ms: 500
+    user-service:
+      max-attempts: 4
+      backoff-ms: 500

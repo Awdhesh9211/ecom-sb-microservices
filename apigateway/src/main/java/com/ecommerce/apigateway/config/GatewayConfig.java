@@ -15,16 +15,44 @@ public class GatewayConfig {
         return builder.routes()
                 .route("user-service", r -> r
                         .path("/api/v1/users/**")
+                        .filters(f->
+                                f.circuitBreaker(config -> config
+                                        .setName("ecomBreaker")
+                                        .setFallbackUri("froward:/fallback/gateway/user")
+                                )
+
+                        )
                         .uri("lb://USER-SERVICE"))
                 .route("product-service", r -> r
                         .path("/api/v1/product/**")
+                        .filters(f->
+                                f.circuitBreaker(config -> config
+                                        .setName("ecomBreaker")
+                                        .setFallbackUri("froward:/fallback/gateway/product")
+                                )
+
+                        )
                         .uri("lb://PRODUCT-SERVICE"))
                 .route("order-service", r -> r
                         .path("/api/v1/order/**")
+                        .filters(f->
+                                f.circuitBreaker(config -> config
+                                        .setName("ecomBreaker")
+                                        .setFallbackUri("froward:/fallback/gateway/order")
+                                )
+
+                        )
                         .uri("lb://ORDER-SERVICE"))
                 .route("cart-service", r -> r
                         .path("/api/v1/cart/**")
-                        .uri("lb://CART-SERVICE"))
+                        .filters(f->
+                                f.circuitBreaker(config -> config
+                                        .setName("ecomBreaker")
+                                        .setFallbackUri("froward:/fallback/gateway/order")
+                                )
+
+                        )
+                        .uri("lb://ORDER-SERVICE"))
                 .route("eureka-server", r -> r
                         .path("/eureka/main")
                         .filters(f -> f.setPath("/"))
@@ -32,6 +60,9 @@ public class GatewayConfig {
                 .route("eureka-server-static", r -> r
                         .path("/eureka/**")
                         .uri("http://localhost:8761"))
+                .route("ectuator", r -> r
+                        .path("/actuator/**")
+                        .uri("http://localhost:8080/actuator"))
                 .build();
     }
 }

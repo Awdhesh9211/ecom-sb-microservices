@@ -38,6 +38,19 @@ management:
     tracing:
       endpoint: http://localhost:9411/api/v2/spans
 
+resilience4j:
+  circuitbreaker:
+    instances:
+      ecomBreaker:
+        slidingWindowSize: 10
+        minimumNumberOfCalls: 5
+        failureRateThreshold: 50
+        waitDurationInOpenState: 10s
+        permittedNumberOfCallsInHalfOpenState: 3
+        automaticTransitionFromOpenToHalfOpenEnabled: true
+        registerHealthIndicator: true
+
+
 logging:
   level:
     org.springframework.cloud.gateway: TRACE

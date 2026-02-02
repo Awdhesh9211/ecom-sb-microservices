@@ -21,9 +21,6 @@ public class ProductServiceClientConfig {
 
        RestClient restClient= restClientBuilder
                .baseUrl("lb://product-service")
-//               .defaultStatusHandler(
-//                       HttpStatusCode::is4xxClientError,
-//                       (req,res)-> Optional.empty())
                .build();
        RestClientAdapter adapter=RestClientAdapter
                .create(restClient);

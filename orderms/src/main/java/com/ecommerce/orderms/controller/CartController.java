@@ -34,46 +34,35 @@ public class CartController {
             @RequestBody CartItemRequest request) {
 
         try {
-            Optional<CartItem> result = cartService.addToCart(userId, request);
-            System.out.println("Result :" + result.get());
-
-            if (result.isEmpty()) {
-                return ResponseEntity.badRequest()
-                        .body(Map.of(
-                                "status","FAILED",
-                                "message","Product out of stock or user not found"
-                        ));
-            }
+            CartItem result = cartService.addToCart(userId, request);
 
             return ResponseEntity.status(HttpStatus.CREATED)
                     .body(Map.of(
                             "status","SUCCESS",
-                            "message","Item added to cart"
+                            "message","Item added to cart",
+                            "cartItemId", result.getId()
                     ));
+
+        } catch (IllegalArgumentException ex) {
+            // Business errors → 400 or 404
+            HttpStatus status = ex.getMessage().contains("not found") ? HttpStatus.NOT_FOUND : HttpStatus.BAD_REQUEST;
+            return ResponseEntity.status(status)
+                    .body(Map.of("status","FAILED","message", ex.getMessage()));
+
+        } catch (IllegalStateException ex) {
+            // Service failures → 503
+            LoggerFactory.getLogger(CartService.class).error(ex.getMessage(), ex);
+            return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
+                    .body(Map.of("status","ERROR","message","Dependent service unavailable"));
 
         } catch (Exception ex) {
-
-            LoggerFactory.getLogger(CartService.class).error(ex.getMessage());
-
-            String message;
-
-            if ("USER_SERVICE_DOWN".equals(ex.getMessage())) {
-                message = "User service temporarily unavailable";
-            }
-            else if ("PRODUCT_SERVICE_DOWN".equals(ex.getMessage())) {
-                message = "Product service temporarily unavailable";
-            }
-            else {
-                message = "Something went wrong";
-            }
-
-            return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
-                    .body(Map.of(
-                            "status","ERROR",
-                            "message", message
-                    ));
+            LoggerFactory.getLogger(CartService.class).error(ex.getMessage(), ex.getClass());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("status","ERROR","message","Something went wrong"));
         }
     }
+
+
 
 
 

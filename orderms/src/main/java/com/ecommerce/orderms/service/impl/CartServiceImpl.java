@@ -10,6 +10,7 @@ import com.ecommerce.orderms.model.cart.CartItem;
 import com.ecommerce.orderms.repository.CartRepository;
 import com.ecommerce.orderms.service.CartService;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import io.github.resilience4j.retry.annotation.Retry;
 import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,6 +28,7 @@ public class CartServiceImpl implements CartService {
     private final ProductServiceClient productServiceClient;
     private final UserServiceClient userServiceClient;
     private final Logger logger=LoggerFactory.getLogger(CartServiceImpl.class);
+    int attempt=0;
 
     public CartServiceImpl(CartRepository cartRepository,ProductServiceClient productServiceClient,UserServiceClient userServiceClientInterface) {
         this.cartRepository = cartRepository;
@@ -65,7 +67,7 @@ public class CartServiceImpl implements CartService {
 
     /* ---------------- ADD TO CART ---------------- */
 
-    // Resillience Logic
+    // Resillience - CIRCUIT breaking  Logic
     @CircuitBreaker(name = "productService", fallbackMethod = "productFallback")
     public ProductResponse fetchProduct(Long productId) {
         try {
@@ -96,36 +98,48 @@ public class CartServiceImpl implements CartService {
 
 
 
-
     @Override
-    @Transactional
-    public Optional<CartItem> addToCart(String userId, CartItemRequest request) {
+    @Retry(
+            name = "retryService",
+            fallbackMethod = "addToCartFallback"
+    )
+    public CartItem addToCart(String userId, CartItemRequest request) {
 
-        // Product call (protected)
-        ProductResponse product =
-                fetchProduct(Long.valueOf(request.getProductId()));
+        System.out.println("ATTEMPT : " + ++attempt);
 
-        if (product == null) return Optional.empty();
-        if (product.getStockQuantity() < request.getQuantity()) return Optional.empty();
-        if (product.getPrice() == null) return Optional.empty();
+        // ---------- PRODUCT CALL ----------
+        ProductResponse product;
+        try {
+            product = productServiceClient
+                    .getProductDetails(Long.valueOf(request.getProductId()));
+        }
+        catch (org.springframework.web.client.HttpClientErrorException.NotFound ex) {
+            // 404 → BUSINESS CASE (NO RETRY)
+            throw new IllegalArgumentException("Product not found");
+        }
+        catch (Exception ex) {
+            // Any OTHER error → service really down → RETRY
+            throw new IllegalStateException("Product service unavailable", ex);
+        }
+        if (product.getPrice() == null)
+            throw new IllegalArgumentException("Invalid product price"); // business → no retry
+        // ----------------------------------
 
-        // User call (protected)
-        UserResponse user = fetchUser(userId);
-        if (user == null) return Optional.empty();
+        // ---------- USER CALL ----------
+        UserResponse user = userServiceClient.getUserDetails(userId);
 
-        CartItem cartItem =
-                cartRepository.findByUserIdAndProductId(
-                        userId, request.getProductId()
-                );
+        if (user == null)
+            throw new IllegalArgumentException("User not found"); // business → no retry
+        // ----------------------------------
 
-        int finalQuantity =
-                (cartItem == null)
-                        ? request.getQuantity()
-                        : cartItem.getQuantity() + request.getQuantity();
+        // ---------- CART LOGIC ----------
+        CartItem cartItem = cartRepository.findByUserIdAndProductId(userId, request.getProductId());
 
-        if (finalQuantity <= 0 ||
-                product.getStockQuantity() < finalQuantity)
-            return Optional.empty();
+        int finalQuantity = (cartItem == null) ? request.getQuantity() : cartItem.getQuantity() + request.getQuantity();
+
+        if (finalQuantity <= 0 || product.getStockQuantity() < finalQuantity) {
+            throw new IllegalArgumentException("Out of stock or invalid quantity"); // business → no retry
+        }
 
         if (cartItem == null) {
             cartItem = new CartItem();
@@ -134,14 +148,25 @@ public class CartServiceImpl implements CartService {
         }
 
         cartItem.setQuantity(finalQuantity);
-        cartItem.setPrice(
-                product.getPrice()
-                        .multiply(BigDecimal.valueOf(finalQuantity))
-        );
+        cartItem.setPrice(product.getPrice().multiply(BigDecimal.valueOf(finalQuantity)));
 
-        cartRepository.save(cartItem);
-        return Optional.of(cartItem);
+        return cartRepository.save(cartItem);
     }
+
+
+
+    public Exception addToCartFallback(
+            String userId,
+            CartItemRequest request,
+            Exception ex) {
+
+        LoggerFactory.getLogger(CartService.class)
+                .error("Fallback triggered: {}", ex.getMessage());
+
+        // Return a dummy CartItem (or null if you prefer)
+        throw null;
+    }
+
 
 
     /* ---------------- DELETE SINGLE ITEM ---------------- */
