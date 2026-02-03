@@ -3,17 +3,14 @@ package com.ecommerce.orderms.controller;
 
 import com.ecommerce.orderms.dto.cart.request.CartItemRequest;
 import com.ecommerce.orderms.dto.cart.response.CartItemResponse;
-import com.ecommerce.orderms.model.cart.CartItem;
 import com.ecommerce.orderms.service.CartService;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.HttpClientErrorException;
 
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/cart")
@@ -33,33 +30,29 @@ public class CartController {
             @RequestHeader("X-User-ID") String userId,
             @RequestBody CartItemRequest request) {
 
-        try {
-            CartItem result = cartService.addToCart(userId, request);
-
-            return ResponseEntity.status(HttpStatus.CREATED)
-                    .body(Map.of(
-                            "status","SUCCESS",
-                            "message","Item added to cart",
-                            "cartItemId", result.getId()
-                    ));
-
-        } catch (IllegalArgumentException ex) {
-            // Business errors → 400 or 404
+        try{
+            boolean added=cartService.addToCart(userId, request);
+            if(!added){
+                return ResponseEntity.badRequest().body("Not able to complete request ");
+            }
+        }catch(HttpClientErrorException.NotFound ex){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("status","ERROR","message",ex.getMessage().split(":",2)));
+        }
+        catch (IllegalArgumentException ex) {
             HttpStatus status = ex.getMessage().contains("not found") ? HttpStatus.NOT_FOUND : HttpStatus.BAD_REQUEST;
             return ResponseEntity.status(status)
                     .body(Map.of("status","FAILED","message", ex.getMessage()));
 
-        } catch (IllegalStateException ex) {
-            // Service failures → 503
-            LoggerFactory.getLogger(CartService.class).error(ex.getMessage(), ex);
-            return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
-                    .body(Map.of("status","ERROR","message","Dependent service unavailable"));
-
         } catch (Exception ex) {
-            LoggerFactory.getLogger(CartService.class).error(ex.getMessage(), ex.getClass());
+            String msg=(ex instanceof IllegalStateException)
+                    ? ex.getMessage().contains("user-service")
+                    ? "USER SERVICE UNAVAILABLE " : "PRODUCT SERVICE UNAVAILABLE"
+                    : ex.getMessage();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("status","ERROR","message","Something went wrong"));
+                    .body(Map.of("status","ERROR","message",msg));
         }
+        return ResponseEntity.ok("Added To Cart");
     }
 
 

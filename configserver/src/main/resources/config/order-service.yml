@@ -91,13 +91,12 @@ resilience4j:
   retry:
     instances:
       retryService:
-        maxAttempts: 4
-        waitDuration: 500ms
-        retryExceptions:
+        max-attempts: 4
+        wait-duration: 2000ms
+        enable-exponential-backoff: true
+        exponential-backoff-multiplier: 2
+        retry-exceptions:
           - java.lang.IllegalStateException
-        ignoreExceptions:
-            - java.lang.RuntimeException
-        # Backoff progression: 500ms → 1000ms → 2000ms
 
         # Retry only on specific exceptions
 #        retryExceptions:

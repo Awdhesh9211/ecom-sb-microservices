@@ -14,6 +14,7 @@ import io.github.resilience4j.retry.annotation.Retry;
 import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cloud.loadbalancer.core.NoopServiceInstanceListSupplier;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -103,33 +104,20 @@ public class CartServiceImpl implements CartService {
             name = "retryService",
             fallbackMethod = "addToCartFallback"
     )
-    public CartItem addToCart(String userId, CartItemRequest request) {
+    public boolean addToCart(String userId, CartItemRequest request) {
 
         System.out.println("ATTEMPT : " + ++attempt);
 
         // ---------- PRODUCT CALL ----------
-        ProductResponse product;
-        try {
-            product = productServiceClient
-                    .getProductDetails(Long.valueOf(request.getProductId()));
-        }
-        catch (org.springframework.web.client.HttpClientErrorException.NotFound ex) {
-            // 404 → BUSINESS CASE (NO RETRY)
-            throw new IllegalArgumentException("Product not found");
-        }
-        catch (Exception ex) {
-            // Any OTHER error → service really down → RETRY
-            throw new IllegalStateException("Product service unavailable", ex);
-        }
+        ProductResponse product = productServiceClient
+                .getProductDetails(Long.valueOf(request.getProductId()));
+
         if (product.getPrice() == null)
-            throw new IllegalArgumentException("Invalid product price"); // business → no retry
+            throw new IllegalArgumentException("Invalid product price");
         // ----------------------------------
 
         // ---------- USER CALL ----------
         UserResponse user = userServiceClient.getUserDetails(userId);
-
-        if (user == null)
-            throw new IllegalArgumentException("User not found"); // business → no retry
         // ----------------------------------
 
         // ---------- CART LOGIC ----------
@@ -138,7 +126,7 @@ public class CartServiceImpl implements CartService {
         int finalQuantity = (cartItem == null) ? request.getQuantity() : cartItem.getQuantity() + request.getQuantity();
 
         if (finalQuantity <= 0 || product.getStockQuantity() < finalQuantity) {
-            throw new IllegalArgumentException("Out of stock or invalid quantity"); // business → no retry
+            throw new IllegalArgumentException("Out of stock or invalid quantity");
         }
 
         if (cartItem == null) {
@@ -150,22 +138,19 @@ public class CartServiceImpl implements CartService {
         cartItem.setQuantity(finalQuantity);
         cartItem.setPrice(product.getPrice().multiply(BigDecimal.valueOf(finalQuantity)));
 
-        return cartRepository.save(cartItem);
+        cartRepository.save(cartItem);
+        return true;
     }
 
-
-
-    public Exception addToCartFallback(
+    public boolean addToCartFallback(
             String userId,
             CartItemRequest request,
-            Exception ex) {
+            Exception ex) throws Exception {
 
-        LoggerFactory.getLogger(CartService.class)
-                .error("Fallback triggered: {}", ex.getMessage());
-
-        // Return a dummy CartItem (or null if you prefer)
-        throw null;
+        logger.error("Fallback triggered after all retries: {} {}", ex.getMessage(), ex.getClass());
+        throw ex;
     }
+
 
 
 
