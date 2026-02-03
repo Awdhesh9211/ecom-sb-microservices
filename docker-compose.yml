@@ -48,10 +48,40 @@ services:
     networks:
       - pg_network
 
+  redis:
+    image: redis:latest
+    container_name: redis
+    restart: unless-stopped
+    command: [ "redis-server", "--appendonly", "yes" ]
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    environment:
+      TZ: Asia/Kolkata
+    networks:
+      - pg_network
+
+  redis-insight:
+    image: redis/redisinsight:latest
+    container_name: redis_insight
+    restart: always
+    ports:
+      - "8001:5540"
+    volumes:
+      - redis_insight_data:/db
+    depends_on:
+      - redis
+    networks:
+      - pg_network
+
+
 volumes:
   postgres_data:
   pgadmin_data:
   rabbitmq_data:
+  redis_data: # <-- new
+  redis_insight_data: # <-- new
 
 networks:
   pg_network:

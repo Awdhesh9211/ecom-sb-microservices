@@ -1,13 +1,40 @@
 package com.ecommerce.apigateway.config;
 
 import org.springframework.cloud.client.loadbalancer.LoadBalanced;
+import org.springframework.cloud.gateway.filter.ratelimit.KeyResolver;
+import org.springframework.cloud.gateway.filter.ratelimit.RedisRateLimiter;
 import org.springframework.cloud.gateway.route.RouteLocator;
 import org.springframework.cloud.gateway.route.builder.RouteLocatorBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
+import reactor.core.publisher.Mono;
 
 @Configuration
 public class GatewayConfig {
+
+    @Bean
+    public RedisRateLimiter redisRateLimiter() {
+        return new RedisRateLimiter(5, 5,1);
+        // 5 requests/sec, burst 10
+    }
+
+    @Bean
+    public KeyResolver hostnameKeyResolver() {
+        return exchange -> {
+            String host = exchange.getRequest()
+                    .getRemoteAddress()
+                    .getAddress()
+                    .getHostName();   // <-- the magic line
+
+            // Fallback in weird cases
+            return Mono.justOrEmpty(host)
+                    .switchIfEmpty(Mono.just("unknown-host"));
+        };
+    }
+
+
+
 
     @Bean
     @LoadBalanced
@@ -15,18 +42,31 @@ public class GatewayConfig {
         return builder.routes()
                 .route("user-service", r -> r
                         .path("/api/v1/users/**")
-                        .filters(f->
-                                f.circuitBreaker(config -> config
-                                        .setName("ecomBreaker")
-                                        .setFallbackUri("froward:/fallback/gateway/user")
+                        .filters(f->f
+                                .requestRateLimiter(config -> config
+                                        .setRateLimiter(redisRateLimiter())
+                                        .setKeyResolver(hostnameKeyResolver())   // ← changed here
                                 )
+//                                .retry(c->c
+//                                        .setRetries(10)
+//                                        .setMethods(HttpMethod.GET,HttpMethod.DELETE,HttpMethod.POST,HttpMethod.PUT)
+//                                )
+//                                .circuitBreaker(config -> config
+//                                        .setName("ecomBreaker")
+//                                        .setFallbackUri("froward:/fallback/gateway/user")
+//                                )
 
                         )
                         .uri("lb://USER-SERVICE"))
                 .route("product-service", r -> r
                         .path("/api/v1/product/**")
                         .filters(f->
-                                f.circuitBreaker(config -> config
+                                f
+                                        .retry(c->c
+                                                .setRetries(10)
+                                                .setMethods(HttpMethod.GET,HttpMethod.DELETE,HttpMethod.POST,HttpMethod.PUT)
+                                        )
+                                        .circuitBreaker(config -> config
                                         .setName("ecomBreaker")
                                         .setFallbackUri("froward:/fallback/gateway/product")
                                 )
@@ -36,7 +76,12 @@ public class GatewayConfig {
                 .route("order-service", r -> r
                         .path("/api/v1/order/**")
                         .filters(f->
-                                f.circuitBreaker(config -> config
+                                f
+                                        .retry(c->c
+                                                .setRetries(10)
+                                                .setMethods(HttpMethod.GET,HttpMethod.DELETE,HttpMethod.POST,HttpMethod.PUT)
+                                        )
+                                        .circuitBreaker(config -> config
                                         .setName("ecomBreaker")
                                         .setFallbackUri("froward:/fallback/gateway/order")
                                 )

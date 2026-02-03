@@ -21,6 +21,10 @@ target/
 *.iml
 *.ipr
 
+#
+evaluate-loki
+evaluate-prometheus
+
 ### NetBeans ###
 /nbproject/private/
 /nbbuild/

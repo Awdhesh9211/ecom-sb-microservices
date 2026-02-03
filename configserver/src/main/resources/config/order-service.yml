@@ -143,18 +143,12 @@ resilience4j:
   # ─────────────────────────────────────────────────────────────
   # TIME LIMITER CONFIGURATION
   # ─────────────────────────────────────────────────────────────
-  timelimiter:
-    configs:
-      default:
-        timeoutDuration: 3s
-        cancelRunningFuture: true
-
+  ratelimiter:
     instances:
-      productService:
-        timeoutDuration: 3s
-
-      userService:
-        timeoutDuration: 3s
+      retryLimiter:
+        timeout_duration: 0
+        limit-refresh-period: 4
+        limit-for-period: 2
 
 # ═══════════════════════════════════════════════════════════════
 # APPLICATION PROPERTIES
