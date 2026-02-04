@@ -1,8 +1,8 @@
 spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/productdb
-    username: postgres
-    password: postgres
+    username: ${DB_USER}
+    password: ${DB_PASS}
     driver-class-name: org.postgresql.Driver
 
   jpa:
@@ -16,6 +16,9 @@ spring:
         format_sql: true
         jdbc:
           time_zone: Asia/Kolkata
+  rabbitmq:
+    addresses: ${RABBIT_ADDRESS}
+    connection-timeout: 30000
 
 
 server:

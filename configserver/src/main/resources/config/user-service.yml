@@ -3,6 +3,9 @@ spring:
     mongodb:
       uri: mongodb://localhost:27017/ms_ecom_userdb
       database: ms_ecom_userdb
+  rabbitmq:
+    addresses: ${RABBIT_ADDRESS}
+    connection-timeout: 30000
 
 
 server:
