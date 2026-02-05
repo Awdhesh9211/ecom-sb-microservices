@@ -15,6 +15,8 @@ import com.ecommerce.orderms.repository.OrderRepository;
 import com.ecommerce.orderms.service.OrderService;
 import jakarta.transaction.Transactional;
 import org.apache.catalina.User;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -24,14 +26,22 @@ import java.util.Optional;
 @Service
 public class OrderServiceImpl implements OrderService {
 
+    @Value("${rabbitmq.exchange.name}")
+    private String exchangeName;
+
+    @Value("${rabbitmq.routing.key}")
+    private String routingKey;
+
     private final CartRepository cartRepository;
     private final OrderRepository orderRepository;
     private final UserServiceClient userServiceClient;
+    private final RabbitTemplate rabbitTemplate;
 
-    public OrderServiceImpl(CartRepository cartRepository, OrderRepository orderRepository,UserServiceClient userServiceClient) {
+    public OrderServiceImpl(CartRepository cartRepository, OrderRepository orderRepository,UserServiceClient userServiceClient,RabbitTemplate rabbitTemplate) {
         this.cartRepository = cartRepository;
         this.orderRepository=orderRepository;
         this.userServiceClient=userServiceClient;
+        this.rabbitTemplate = rabbitTemplate;
     }
 
     ///  MAPPER
@@ -86,8 +96,14 @@ public class OrderServiceImpl implements OrderService {
         Order saveOrder=orderRepository.save(order);
         // Clear the cart
         cartRepository.deleteByUserId(userId);
-
-        return Optional.of(mapToOrderResponse(saveOrder));
+        OrderResponse orderResponse=mapToOrderResponse(saveOrder);
+        // produce notification
+        rabbitTemplate.convertAndSend(
+                exchangeName,
+                routingKey,
+                orderResponse
+        );
+        return Optional.of(orderResponse);
     }
 
     @Override
