@@ -14,9 +14,9 @@ import com.ecommerce.orderms.repository.CartRepository;
 import com.ecommerce.orderms.repository.OrderRepository;
 import com.ecommerce.orderms.service.OrderService;
 import jakarta.transaction.Transactional;
-import org.apache.catalina.User;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
+//import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.stream.function.StreamBridge;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -26,22 +26,24 @@ import java.util.Optional;
 @Service
 public class OrderServiceImpl implements OrderService {
 
-    @Value("${rabbitmq.exchange.name}")
-    private String exchangeName;
-
-    @Value("${rabbitmq.routing.key}")
-    private String routingKey;
+//    @Value("${rabbitmq.exchange.name}")
+//    private String exchangeName;
+//
+//    @Value("${rabbitmq.routing.key}")
+//    private String routingKey;
 
     private final CartRepository cartRepository;
     private final OrderRepository orderRepository;
     private final UserServiceClient userServiceClient;
-    private final RabbitTemplate rabbitTemplate;
+    private final StreamBridge streamBridge;
+//    private final RabbitTemplate rabbitTemplate;  switch to cloud stream
 
-    public OrderServiceImpl(CartRepository cartRepository, OrderRepository orderRepository,UserServiceClient userServiceClient,RabbitTemplate rabbitTemplate) {
+    public OrderServiceImpl(CartRepository cartRepository, OrderRepository orderRepository,UserServiceClient userServiceClient,StreamBridge streamBridge) {
         this.cartRepository = cartRepository;
         this.orderRepository=orderRepository;
         this.userServiceClient=userServiceClient;
-        this.rabbitTemplate = rabbitTemplate;
+//        this.rabbitTemplate = rabbitTemplate;
+        this.streamBridge=streamBridge;
     }
 
     ///  MAPPER
@@ -98,11 +100,13 @@ public class OrderServiceImpl implements OrderService {
         cartRepository.deleteByUserId(userId);
         OrderResponse orderResponse=mapToOrderResponse(saveOrder);
         // produce notification
-        rabbitTemplate.convertAndSend(
-                exchangeName,
-                routingKey,
-                orderResponse
-        );
+//        rabbitTemplate.convertAndSend(
+//                exchangeName,
+//                routingKey,
+//                orderResponse
+//        );
+        //produce by streambridge cloud stream
+        streamBridge.send("createOrder-out-0",orderResponse);
         return Optional.of(orderResponse);
     }
 

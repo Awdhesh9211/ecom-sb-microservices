@@ -1,10 +1,11 @@
 spring:
+#  DB
   datasource:
     url: jdbc:postgresql://localhost:5432/orderdb
     username: ${DB_USER}
     password: ${DB_PASS}
     driver-class-name: org.postgresql.Driver
-
+# JPA
   jpa:
     database: postgresql
     database-platform: org.hibernate.dialect.PostgreSQLDialect
@@ -16,18 +17,30 @@ spring:
         format_sql: true
         jdbc:
           time_zone: Asia/Kolkata
+# cloud stream of rabbit
+  cloud:
+    stream:
+      bindings:
+        createOrder-out-0: # <-- output channel of your function
+          destination: order.exchange
+          content-type: application/json
 
+      rabbit:
+        bindings:
+          createOrder-out-0:
+            producer:
+              routing-key-expression: '''order.tracking'''
   rabbitmq:
     addresses: ${RABBIT_ADDRESS}
     connection-timeout: 30000
 
-rabbitmq:
-  exchange:
-    name: order.exchange
-  queue:
-    name: order.queue
-  routing:
-    key: order.tracking
+#rabbitmq:
+#  exchange:
+#    name: order.exchange
+#  queue:
+#    name: order.queue
+#  routing:
+#    key: order.tracking
 
 server:
   port: 8083
