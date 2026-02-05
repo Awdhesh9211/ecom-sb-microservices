@@ -3,6 +3,7 @@ package com.ecommerce.notification.dto.order.response;
 
 
 import com.ecommerce.notification.dto.enumclasses.OrderStatus;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -13,6 +14,7 @@ public class OrderResponse {
     private BigDecimal totalAmount;
     private OrderStatus status;
     private List<OrderItemDTO> items;
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSSSS")
     private LocalDateTime createdAt;
 
 

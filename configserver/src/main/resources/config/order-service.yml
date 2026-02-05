@@ -19,17 +19,30 @@ spring:
           time_zone: Asia/Kolkata
 # cloud stream of rabbit
   cloud:
+    bus:
+      enabled: true
+      destination: springCloudBus   # bus topic/queue name
     stream:
       bindings:
         createOrder-out-0: # <-- output channel of your function
           destination: order.exchange
           content-type: application/json
+      # 👉 EXPLICITLY TELL SPRING: "USE KAFKA"
+        springCloudBus-out-0:
+          binder: rabbit
+        springCloudBus-in-0:
+          binder: rabbit
+      default-binder: kafka
+      kafka:
+        binder:
+          brokers: localhost:9092
 
-      rabbit:
-        bindings:
-          createOrder-out-0:
-            producer:
-              routing-key-expression: '''order.tracking'''
+
+  #      rabbit:
+#        bindings:
+#          createOrder-out-0:
+#            producer:
+#              routing-key-expression: '''order.tracking'''
   rabbitmq:
     addresses: ${RABBIT_ADDRESS}
     connection-timeout: 30000

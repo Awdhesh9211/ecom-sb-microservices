@@ -12,10 +12,13 @@ spring:
           destination: order.exchange
           group: notification-group
           content-type: application/json
+      kafka:
+        binder:
+          brokers: localhost:9092
 
-  rabbitmq:
-    addresses: ${RABBIT_ADDRESS}
-    connection-timeout: 30000
+#  rabbitmq:
+#    addresses: ${RABBIT_ADDRESS}
+#    connection-timeout: 30000
 
 #rabbitmq:
 #  exchange:
