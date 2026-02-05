@@ -1,17 +1,29 @@
 spring:
   application:
     name: notification
+  cloud:
+    function:
+      definition: orderCreated
+    stream:
+      function:
+        definition: orderCreated
+      bindings:
+        orderCreated-in-0: # <-- input chanel channel of your function
+          destination: order.exchange
+          group: notification-group
+          content-type: application/json
+
   rabbitmq:
     addresses: ${RABBIT_ADDRESS}
     connection-timeout: 30000
 
-rabbitmq:
-  exchange:
-    name: order.exchange
-  queue:
-    name: order.queue
-  routing:
-    key: order.tracking
+#rabbitmq:
+#  exchange:
+#    name: order.exchange
+#  queue:
+#    name: order.queue
+#  routing:
+#    key: order.tracking
 
 
 

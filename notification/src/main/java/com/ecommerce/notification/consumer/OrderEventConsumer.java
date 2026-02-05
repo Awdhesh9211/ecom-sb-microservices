@@ -2,18 +2,21 @@ package com.ecommerce.notification.consumer;
 
 
 import com.ecommerce.notification.dto.order.response.OrderResponse;
-import org.springframework.amqp.rabbit.annotation.RabbitListener;
-import org.springframework.stereotype.Service;
-import tools.jackson.databind.ObjectMapper;
+import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
-@Service
+import java.util.function.Consumer;
+
+@Configuration
 public class OrderEventConsumer {
 
 
-    @RabbitListener(queues = "order.queue")
-    public void handleOrderEvent(OrderResponse orderResponse){
-        ObjectMapper mapper = new ObjectMapper();
-        System.out.println(mapper.writeValueAsString(orderResponse));
-
+    @Bean
+    public Consumer<OrderResponse> orderCreated(){
+       return event->{
+           LoggerFactory.getLogger(OrderEventConsumer.class).info("ID : "+ event.getId());
+       };
     }
+
 }

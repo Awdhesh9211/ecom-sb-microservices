@@ -101,3 +101,140 @@ Caused by: org.springframework.util.PlaceholderResolutionException: Could not re
 2026-02-05 10:12:26.855 | INFO  | [main] | com.ecommerce.orderms.OrdermsApplication | Starting OrdermsApplication using Java 21.0.1 with PID 20700 (D:\18_UDEMY\SPRING_BOOT_MICROSERVICES\ecom-app-ms\orderms\target\classes started by ankit gaund in D:\18_UDEMY\SPRING_BOOT_MICROSERVICES\ecom-app-ms)
 2026-02-05 10:12:26.865 | DEBUG | [main] | com.ecommerce.orderms.OrdermsApplication | Running with Spring Boot v4.0.2, Spring v7.0.3
 2026-02-05 10:12:26.868 | INFO  | [main] | com.ecommerce.orderms.OrdermsApplication | No active profile set, falling back to 1 default profile: "default"
+2026-02-05 10:13:02.615 | INFO  | [main] | com.ecommerce.orderms.OrdermsApplication | Starting OrdermsApplication using Java 21.0.1 with PID 11720 (D:\18_UDEMY\SPRING_BOOT_MICROSERVICES\ecom-app-ms\orderms\target\classes started by ankit gaund in D:\18_UDEMY\SPRING_BOOT_MICROSERVICES\ecom-app-ms)
+2026-02-05 10:13:02.636 | DEBUG | [main] | com.ecommerce.orderms.OrdermsApplication | Running with Spring Boot v4.0.2, Spring v7.0.3
+2026-02-05 10:13:02.639 | INFO  | [main] | com.ecommerce.orderms.OrdermsApplication | No active profile set, falling back to 1 default profile: "default"
+2026-02-05 10:13:02.839 | INFO  | [main] | o.s.c.config.client.ConfigServerConfigDataLoader | Fetching config from server at : http://localhost:8888
+2026-02-05 10:13:02.841 | INFO  | [main] | o.s.c.config.client.ConfigServerConfigDataLoader | Located environment: name=order-service, profiles=[default], label=null, version=null, state=null
+2026-02-05 10:13:06.875 | DEBUG | [main] | i.g.r.spring6.utils.RxJava2OnClasspathCondition | RxJava2 related Aspect extensions are not activated, because RxJava2 is not on the classpath.
+2026-02-05 10:13:06.880 | DEBUG | [main] | i.g.r.spring6.utils.RxJava3OnClasspathCondition | RxJava3 related Aspect extensions are not activated, because RxJava3 is not on the classpath.
+2026-02-05 10:13:06.884 | DEBUG | [main] | i.g.r.spring6.utils.ReactorOnClasspathCondition | Reactor related Aspect extensions are not activated because Resilience4j Reactor module is not on the classpath.
+2026-02-05 10:13:06.966 | DEBUG | [main] | i.g.r.spring6.utils.RxJava2OnClasspathCondition | RxJava2 related Aspect extensions are not activated, because RxJava2 is not on the classpath.
+2026-02-05 10:13:06.968 | DEBUG | [main] | i.g.r.spring6.utils.RxJava3OnClasspathCondition | RxJava3 related Aspect extensions are not activated, because RxJava3 is not on the classpath.
+2026-02-05 10:13:06.971 | DEBUG | [main] | i.g.r.spring6.utils.ReactorOnClasspathCondition | Reactor related Aspect extensions are not activated because Resilience4j Reactor module is not on the classpath.
+2026-02-05 10:13:07.104 | DEBUG | [main] | i.g.r.spring6.utils.RxJava2OnClasspathCondition | RxJava2 related Aspect extensions are not activated, because RxJava2 is not on the classpath.
+2026-02-05 10:13:07.111 | DEBUG | [main] | i.g.r.spring6.utils.RxJava3OnClasspathCondition | RxJava3 related Aspect extensions are not activated, because RxJava3 is not on the classpath.
+2026-02-05 10:13:07.118 | DEBUG | [main] | i.g.r.spring6.utils.ReactorOnClasspathCondition | Reactor related Aspect extensions are not activated because Resilience4j Reactor module is not on the classpath.
+2026-02-05 10:13:07.187 | DEBUG | [main] | i.g.r.spring6.utils.RxJava2OnClasspathCondition | RxJava2 related Aspect extensions are not activated, because RxJava2 is not on the classpath.
+2026-02-05 10:13:07.188 | DEBUG | [main] | i.g.r.spring6.utils.RxJava3OnClasspathCondition | RxJava3 related Aspect extensions are not activated, because RxJava3 is not on the classpath.
+2026-02-05 10:13:07.189 | DEBUG | [main] | i.g.r.spring6.utils.ReactorOnClasspathCondition | Reactor related Aspect extensions are not activated because Resilience4j Reactor module is not on the classpath.
+2026-02-05 10:13:07.278 | DEBUG | [main] | i.g.r.spring6.utils.RxJava2OnClasspathCondition | RxJava2 related Aspect extensions are not activated, because RxJava2 is not on the classpath.
+2026-02-05 10:13:07.280 | DEBUG | [main] | i.g.r.spring6.utils.RxJava3OnClasspathCondition | RxJava3 related Aspect extensions are not activated, because RxJava3 is not on the classpath.
+2026-02-05 10:13:07.282 | DEBUG | [main] | i.g.r.spring6.utils.ReactorOnClasspathCondition | Reactor related Aspect extensions are not activated because Resilience4j Reactor module is not on the classpath.
+2026-02-05 10:13:07.364 | DEBUG | [main] | i.g.r.spring6.utils.RxJava2OnClasspathCondition | RxJava2 related Aspect extensions are not activated, because RxJava2 is not on the classpath.
+2026-02-05 10:13:07.366 | DEBUG | [main] | i.g.r.spring6.utils.RxJava3OnClasspathCondition | RxJava3 related Aspect extensions are not activated, because RxJava3 is not on the classpath.
+2026-02-05 10:13:07.367 | DEBUG | [main] | i.g.r.spring6.utils.ReactorOnClasspathCondition | Reactor related Aspect extensions are not activated because Resilience4j Reactor module is not on the classpath.
+2026-02-05 10:13:08.696 | INFO  | [main] | o.s.d.r.config.RepositoryConfigurationDelegate | Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-02-05 10:13:09.467 | INFO  | [main] | o.s.d.r.config.RepositoryConfigurationDelegate | Finished Spring Data repository scanning in 700 ms. Found 2 JPA repository interfaces.
+2026-02-05 10:13:10.852 | INFO  | [main] | o.s.i.c.DefaultConfiguringBeanFactoryPostProcessor | No bean named 'errorChannel' has been explicitly defined. Therefore, a default PublishSubscribeChannel will be created.
+2026-02-05 10:13:10.886 | INFO  | [main] | o.s.i.c.DefaultConfiguringBeanFactoryPostProcessor | No bean named 'integrationHeaderChannelRegistry' has been explicitly defined. Therefore, a default DefaultHeaderChannelRegistry will be created.
+2026-02-05 10:13:11.768 | INFO  | [main] | o.springframework.cloud.context.scope.GenericScope | BeanFactory id=15f4d7e7-fa7d-3a5f-89c2-1e0ee6d5a8b3
+2026-02-05 10:13:14.570 | INFO  | [main] | org.springframework.boot.tomcat.TomcatWebServer | Tomcat initialized with port 8083 (http)
+2026-02-05 10:13:14.612 | INFO  | [main] | org.apache.catalina.core.StandardService | Starting service [Tomcat]
+2026-02-05 10:13:14.613 | INFO  | [main] | org.apache.catalina.core.StandardEngine | Starting Servlet engine: [Apache Tomcat/11.0.15]
+2026-02-05 10:13:14.889 | INFO  | [main] | o.s.b.w.c.servlet.WebApplicationContextInitializer | Root WebApplicationContext: initialization completed in 12038 ms
+2026-02-05 10:13:18.530 | INFO  | [main] | org.hibernate.orm.jpa | HHH008540: Processing PersistenceUnitInfo [name: default]
+2026-02-05 10:13:18.808 | INFO  | [main] | org.hibernate.orm.core | HHH000001: Hibernate ORM core version 7.2.1.Final
+2026-02-05 10:13:20.371 | INFO  | [main] | o.s.o.j.persistenceunit.SpringPersistenceUnitInfo | No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-02-05 10:13:20.482 | INFO  | [main] | com.zaxxer.hikari.HikariDataSource | HikariPool-1 - Starting...
+2026-02-05 10:13:20.941 | INFO  | [main] | com.zaxxer.hikari.pool.HikariPool | HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@751636da
+2026-02-05 10:13:20.945 | INFO  | [main] | com.zaxxer.hikari.HikariDataSource | HikariPool-1 - Start completed.
+2026-02-05 10:13:21.297 | WARN  | [main] | org.hibernate.orm.deprecation | HHH90000025: PostgreSQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-02-05 10:13:21.477 | INFO  | [main] | org.hibernate.orm.connections.pooling | HHH10001005: Database info:
+	Database JDBC URL [jdbc:postgresql://localhost:5432/orderdb]
+	Database driver: PostgreSQL JDBC Driver
+	Database dialect: PostgreSQLDialect
+	Database version: 18.1
+	Default catalog/schema: orderdb/public
+	Autocommit mode: undefined/unknown
+	Isolation level: READ_COMMITTED [default READ_COMMITTED]
+	JDBC fetch size: none
+	Pool: DataSourceConnectionProvider
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-02-05 10:13:23.997 | INFO  | [main] | org.hibernate.orm.core | HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-02-05 10:13:24.240 | INFO  | [main] | o.s.orm.jpa.LocalContainerEntityManagerFactoryBean | Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-02-05 10:13:24.904 | INFO  | [main] | o.s.d.jpa.repository.query.QueryEnhancerFactories | Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-02-05 10:13:30.646 | WARN  | [main] | o.s.b.j.a.JpaBaseConfiguration$JpaWebConfiguration | spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-02-05 10:13:33.378 | INFO  | [main] | o.s.c.stream.messaging.DirectWithAttributesChannel | Channel 'order-service.springCloudBusInput' has 1 subscriber(s).
+2026-02-05 10:13:35.744 | INFO  | [main] | org.springframework.cloud.commons.util.InetUtils | Cannot determine local hostname
+2026-02-05 10:13:36.968 | INFO  | [main] | org.springframework.cloud.commons.util.InetUtils | Cannot determine local hostname
+2026-02-05 10:13:40.119 | INFO  | [main] | org.springframework.cloud.commons.util.InetUtils | Cannot determine local hostname
+2026-02-05 10:13:40.192 | INFO  | [main] | o.s.c.n.e.c.DiscoveryClientOptionalArgsConfiguration | Eureka HTTP Client uses RestClient.
+2026-02-05 10:13:40.475 | WARN  | [main] | o.s.c.l.c.LoadBalancerCacheAutoConfiguration$LoadBalancerCaffeineWarnLogger | Spring Cloud LoadBalancer is currently working with the default cache. While this cache implementation is useful for development and tests, it's recommended to use Caffeine cache in production.You can switch to using Caffeine cache, by adding it and org.springframework.cache.caffeine.CaffeineCacheManager to the classpath.
+2026-02-05 10:13:40.512 | INFO  | [main] | o.s.b.actuate.endpoint.web.EndpointLinksResolver | Exposing 36 endpoints beneath base path '/actuator'
+2026-02-05 10:13:41.185 | INFO  | [main] | o.s.integration.endpoint.EventDrivenConsumer | Adding {logging-channel-adapter:_org.springframework.integration.errorLogger} as a subscriber to the 'errorChannel' channel
+2026-02-05 10:13:41.189 | INFO  | [main] | o.s.integration.channel.PublishSubscribeChannel | Channel 'order-service.errorChannel' has 1 subscriber(s).
+2026-02-05 10:13:41.193 | INFO  | [main] | o.s.integration.endpoint.EventDrivenConsumer | started bean '_org.springframework.integration.errorLogger'
+2026-02-05 10:13:41.338 | INFO  | [main] | o.s.cloud.netflix.eureka.InstanceInfoFactory | Setting initial instance status as: STARTING
+2026-02-05 10:13:41.466 | INFO  | [main] | com.netflix.discovery.DiscoveryClient | Initializing Eureka in region us-east-1
+2026-02-05 10:13:41.477 | INFO  | [main] | c.n.d.shared.resolver.aws.ConfigClusterResolver | Resolving eureka endpoints via configuration
+2026-02-05 10:13:41.498 | INFO  | [main] | com.netflix.discovery.DiscoveryClient | Disable delta property : false
+2026-02-05 10:13:41.498 | INFO  | [main] | com.netflix.discovery.DiscoveryClient | Single vip registry refresh property : null
+2026-02-05 10:13:41.500 | INFO  | [main] | com.netflix.discovery.DiscoveryClient | Force full registry fetch : false
+2026-02-05 10:13:41.500 | INFO  | [main] | com.netflix.discovery.DiscoveryClient | Application is null : false
+2026-02-05 10:13:41.500 | INFO  | [main] | com.netflix.discovery.DiscoveryClient | Registered Applications size is zero : true
+2026-02-05 10:13:41.500 | INFO  | [main] | com.netflix.discovery.DiscoveryClient | Application version is -1: true
+2026-02-05 10:13:41.500 | INFO  | [main] | com.netflix.discovery.DiscoveryClient | Getting all instance registry info from the eureka server
+2026-02-05 10:13:41.956 | INFO  | [main] | com.netflix.discovery.DiscoveryClient | The response status is 200
+2026-02-05 10:13:41.961 | INFO  | [main] | com.netflix.discovery.DiscoveryClient | Starting heartbeat executor: renew interval is: 30
+2026-02-05 10:13:41.965 | INFO  | [main] | com.netflix.discovery.InstanceInfoReplicator | InstanceInfoReplicator onDemand update allowed rate per min is 4
+2026-02-05 10:13:41.967 | INFO  | [main] | com.netflix.discovery.DiscoveryClient | Discovery Client initialized at timestamp 1770266621967 with initial instances count: 4
+2026-02-05 10:13:41.987 | INFO  | [main] | o.s.c.n.e.serviceregistry.EurekaServiceRegistry | Registering application ORDER-SERVICE with eureka with status UP
+2026-02-05 10:13:41.990 | INFO  | [main] | com.netflix.discovery.DiscoveryClient | Saw local status change event StatusChangeEvent [timestamp=1770266621990, current=UP, previous=STARTING]
+2026-02-05 10:13:41.994 | INFO  | [DiscoveryClient-InstanceInfoReplicator-%d] | com.netflix.discovery.DiscoveryClient | DiscoveryClient_ORDER-SERVICE/localhost:order-service:8083: registering service...
+2026-02-05 10:13:41.996 | INFO  | [main] | o.s.cloud.stream.binder.DefaultBinderFactory | Creating binder: rabbit
+2026-02-05 10:13:41.996 | INFO  | [main] | o.s.cloud.stream.binder.DefaultBinderFactory | Constructing binder child context for rabbit
+2026-02-05 10:13:42.114 | INFO  | [DiscoveryClient-InstanceInfoReplicator-%d] | com.netflix.discovery.DiscoveryClient | DiscoveryClient_ORDER-SERVICE/localhost:order-service:8083 - registration status: 204
+2026-02-05 10:13:42.447 | INFO  | [main] | o.s.cloud.stream.binder.DefaultBinderFactory | Caching the binder: rabbit
+2026-02-05 10:13:42.483 | INFO  | [main] | o.s.c.s.b.r.p.RabbitExchangeQueueProvisioner | declaring queue for inbound: springCloudBus.anonymous.vOvlY0ggTP2irv57Pn087w, bound to: springCloudBus
+2026-02-05 10:13:42.501 | INFO  | [main] | o.s.a.rabbit.connection.CachingConnectionFactory | Attempting to connect to: [lionfish.rmq.cloudamqp.com:5671]
+2026-02-05 10:13:44.642 | INFO  | [main] | o.s.a.rabbit.connection.CachingConnectionFactory | Created new connection: rabbitConnectionFactory#60b4ce86:0/SimpleConnection@353cf6 [delegate=amqp://crapoxzd@13.126.49.211:5671/crapoxzd, localPort=58939]
+2026-02-05 10:13:44.886 | INFO  | [main] | o.s.cloud.stream.binder.BinderErrorChannel | Channel 'rabbit-1008053036.springCloudBusInput.errors' has 1 subscriber(s).
+2026-02-05 10:13:44.889 | INFO  | [main] | o.s.cloud.stream.binder.BinderErrorChannel | Channel 'rabbit-1008053036.springCloudBusInput.errors' has 2 subscriber(s).
+2026-02-05 10:13:45.041 | INFO  | [main] | o.s.i.amqp.inbound.AmqpInboundChannelAdapter | started bean 'inbound.springCloudBus.anonymous.vOvlY0ggTP2irv57Pn087w'
+2026-02-05 10:13:45.089 | INFO  | [main] | org.springframework.boot.tomcat.TomcatWebServer | Tomcat started on port 8083 (http) with context path '/api/v1'
+2026-02-05 10:13:45.093 | INFO  | [main] | o.s.c.n.e.s.EurekaAutoServiceRegistration | Updating port to 8083
+2026-02-05 10:13:46.143 | INFO  | [main] | org.springframework.cloud.commons.util.InetUtils | Cannot determine local hostname
+2026-02-05 10:13:47.205 | INFO  | [main] | org.springframework.cloud.commons.util.InetUtils | Cannot determine local hostname
+2026-02-05 10:13:47.407 | INFO  | [main] | com.ecommerce.orderms.OrdermsApplication | Started OrdermsApplication in 50.494 seconds (process running for 58.692)
+2026-02-05 10:14:27.054 | INFO  | [http-nio-8083-exec-2] | o.a.c.c.C.[Tomcat].[localhost].[/api/v1] | Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-02-05 10:14:27.056 | INFO  | [http-nio-8083-exec-2] | org.springframework.web.servlet.DispatcherServlet | Initializing Servlet 'dispatcherServlet'
+2026-02-05 10:14:27.077 | INFO  | [http-nio-8083-exec-2] | org.springframework.web.servlet.DispatcherServlet | Completed initialization in 19 ms
+2026-02-05 10:14:30.550 | WARN  | [AsyncReporter{ZipkinHttpClientSender{http://localhost:9411/api/v2/spans}}] | z.r.internal.AsyncReporter$BoundedAsyncReporter | Spans were dropped due to exceptions. All subsequent errors will be logged at FINE level.
+2026-02-05 10:14:30.551 | WARN  | [AsyncReporter{ZipkinHttpClientSender{http://localhost:9411/api/v2/spans}}] | z.r.internal.AsyncReporter$BoundedAsyncReporter | Dropped 1 spans due to ConnectException()
+java.net.ConnectException
+	at java.net.http/jdk.internal.net.http.HttpClientImpl.send(HttpClientImpl.java:951)
+	at java.net.http/jdk.internal.net.http.HttpClientFacade.send(HttpClientFacade.java:133)
+	at org.springframework.boot.zipkin.autoconfigure.ZipkinHttpClientSender.postSpans(ZipkinHttpClientSender.java:59)
+	at org.springframework.boot.zipkin.autoconfigure.HttpSender.postSpans(HttpSender.java:69)
+	at org.springframework.boot.zipkin.autoconfigure.HttpSender.postSpans(HttpSender.java:41)
+	at zipkin2.reporter.BaseHttpSender.send(BaseHttpSender.java:123)
+	at zipkin2.reporter.internal.AsyncReporter$BoundedAsyncReporter.flush(AsyncReporter.java:266)
+	at zipkin2.reporter.internal.AsyncReporter$Flusher.run(AsyncReporter.java:352)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+Caused by: java.net.ConnectException
+	at java.net.http/jdk.internal.net.http.common.Utils.toConnectException(Utils.java:1028)
+	at java.net.http/jdk.internal.net.http.PlainHttpConnection.connectAsync(PlainHttpConnection.java:227)
+	at java.net.http/jdk.internal.net.http.PlainHttpConnection.checkRetryConnect(PlainHttpConnection.java:280)
+	at java.net.http/jdk.internal.net.http.PlainHttpConnection.lambda$connectAsync$2(PlainHttpConnection.java:238)
+	at java.base/java.util.concurrent.CompletableFuture.uniHandle(CompletableFuture.java:934)
+	at java.base/java.util.concurrent.CompletableFuture$UniHandle.tryFire(CompletableFuture.java:911)
+	at java.base/java.util.concurrent.CompletableFuture.postComplete(CompletableFuture.java:510)
+	at java.base/java.util.concurrent.CompletableFuture$AsyncSupply.run(CompletableFuture.java:1773)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)
+	... 1 common frames omitted
+Caused by: java.nio.channels.ClosedChannelException
+	at java.base/sun.nio.ch.SocketChannelImpl.ensureOpen(SocketChannelImpl.java:202)
+	at java.base/sun.nio.ch.SocketChannelImpl.beginConnect(SocketChannelImpl.java:786)
+	at java.base/sun.nio.ch.SocketChannelImpl.connect(SocketChannelImpl.java:874)
+	at java.net.http/jdk.internal.net.http.PlainHttpConnection.lambda$connectAsync$1(PlainHttpConnection.java:210)
+	at java.base/java.security.AccessController.doPrivileged(AccessController.java:571)
+	at java.net.http/jdk.internal.net.http.PlainHttpConnection.connectAsync(PlainHttpConnection.java:212)
+	... 9 common frames omitted
+2026-02-05 10:14:38.032 | DEBUG | [http-nio-8083-exec-5] | i.g.r.spring6.retry.configure.RetryAspect | Created or retrieved retry 'retryService' with max attempts rate '4'  for method: 'com.ecommerce.orderms.service.impl.CartServiceImpl#addToCart'
+2026-02-05 10:15:05.623 | INFO  | [http-nio-8083-exec-4] | o.s.c.stream.messaging.DirectWithAttributesChannel | Channel 'order-service.createOrder-out-0' has 1 subscriber(s).
+2026-02-05 10:15:05.716 | INFO  | [http-nio-8083-exec-4] | o.s.a.rabbit.connection.CachingConnectionFactory | Attempting to connect to: [lionfish.rmq.cloudamqp.com:5671]
+2026-02-05 10:15:08.640 | INFO  | [http-nio-8083-exec-4] | o.s.a.rabbit.connection.CachingConnectionFactory | Created new connection: rabbitConnectionFactory.publisher#5d165d54:0/SimpleConnection@21b53ff5 [delegate=amqp://crapoxzd@13.126.49.211:5671/crapoxzd, localPort=59411]
+2026-02-05 10:15:08.654 | INFO  | [http-nio-8083-exec-4] | org.springframework.amqp.rabbit.core.RabbitAdmin | Auto-declaring a non-durable, auto-delete, or exclusive Queue (springCloudBus.anonymous.vOvlY0ggTP2irv57Pn087w) durable:false, auto-delete:true, exclusive:true. It will be redeclared if the broker stops and is restarted while the connection factory is alive, but all messages will be lost.
