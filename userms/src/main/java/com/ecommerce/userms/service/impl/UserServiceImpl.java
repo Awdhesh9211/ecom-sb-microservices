@@ -7,6 +7,7 @@ import com.ecommerce.userms.model.Address;
 import com.ecommerce.userms.model.User;
 import com.ecommerce.userms.repository.UserRepository;
 import com.ecommerce.userms.service.UserService;
+import com.ecommerce.userms.service.adminservice.KeycloakAdminService;
 import org.springframework.stereotype.Service;
 
 
@@ -18,9 +19,11 @@ import java.util.stream.Collectors;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
+    private final KeycloakAdminService keycloakAdminService;
 
-    public UserServiceImpl(UserRepository userRepository) {
+    public UserServiceImpl(UserRepository userRepository, KeycloakAdminService keycloakAdminService) {
         this.userRepository = userRepository;
+        this.keycloakAdminService = keycloakAdminService;
     }
 
     // Mapper
@@ -32,6 +35,8 @@ public class UserServiceImpl implements UserService {
         UserResponse userResponse=new UserResponse();
         userResponse.setId(String.valueOf(user.getId()));
         userResponse.setFirstName(user.getFirstName());
+        userResponse.setKeycloakId(user.getKeycloakId());
+        userResponse.setUsername(user.getUsername());
         userResponse.setLastName(user.getLastName());
         userResponse.setEmail(user.getEmail());
         userResponse.setPhone(user.getPhone());
@@ -113,11 +118,42 @@ public class UserServiceImpl implements UserService {
     }
 
     public boolean createUser(UserRequest userRequest){
-        User user = new User();
-        mapUserRequestToUser(userRequest, user);
-        userRepository.save(user);
-        return true;
+
+        // Step 1 — Pehle Keycloak me create
+        String keycloakId = keycloakAdminService.createUser(
+                userRequest.getUsername(),
+                userRequest.getEmail(),
+                userRequest.getFirstName(),
+                userRequest.getLastName(),
+                userRequest.getPassword()
+        );
+
+        try {
+            // Step 2 — Default role assign (agar fail hua to exception)
+            keycloakAdminService.assignRealmRoleToUser(
+                    userRequest.getUsername(),
+                    "USER",
+                    keycloakId
+            );
+
+            // Step 3 — Ab database me save
+            User user = new User();
+            mapUserRequestToUser(userRequest, user);
+            user.setKeycloakId(keycloakId);
+            user.setUsername(userRequest.getUsername());
+
+            userRepository.save(user);
+
+            return true;
+
+        } catch (Exception e) {
+
+            keycloakAdminService.deleteUser(keycloakId);
+
+            throw new RuntimeException("User creation failed, rolled back in Keycloak", e);
+        }
     }
+
 
     public Optional<UserResponse> getUser(String id){
         return userRepository.findById(id)

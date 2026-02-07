@@ -22,5 +22,13 @@ management:
     shutdown:
       enabled: true
 
+keycloak:
+  admin:
+    username: awdhesh9211
+    password: admin
+    serveruri: http://localhost:8089
+    realm: ecom-app
+    clientId: admin-cli
+
 app:
   message: "Hello User ms"

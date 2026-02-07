@@ -2,10 +2,12 @@ package com.ecommerce.userms.dto.request;
 
 public class UserRequest {
 
+    private String username;
     private String firstName;
     private String lastName;
     private String email;
     private String phone;
+    private String password;
     private AddressDTO address;
 
     //CONSTRUCTOR GETTER SETTER
@@ -51,5 +53,21 @@ public class UserRequest {
 
     public void setAddress(AddressDTO address) {
         this.address = address;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 }

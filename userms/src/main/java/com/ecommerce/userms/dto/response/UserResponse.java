@@ -5,6 +5,8 @@ import com.ecommerce.userms.dto.request.AddressDTO;
 
 public class UserResponse {
     private String id;
+    private String username;
+    private String keycloakId;
     private String firstName;
     private String lastName;
     private String email;
@@ -62,5 +64,21 @@ public class UserResponse {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getKeycloakId() {
+        return keycloakId;
+    }
+
+    public void setKeycloakId(String keycloakId) {
+        this.keycloakId = keycloakId;
     }
 }
