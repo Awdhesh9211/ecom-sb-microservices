@@ -17,6 +17,7 @@ public class User {
 
     @Id
     private String id;
+    private String keycloakId;
     private String firstName;
     private String lastName;
 
@@ -91,5 +92,13 @@ public class User {
 
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public String getKeycloakId() {
+        return keycloakId;
+    }
+
+    public void setKeycloakId(String keycloakId) {
+        this.keycloakId = keycloakId;
     }
 }
