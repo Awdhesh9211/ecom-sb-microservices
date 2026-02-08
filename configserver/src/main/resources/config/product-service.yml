@@ -1,4 +1,12 @@
+server:
+  port: 8082
+  servlet:
+    context-path: /api/v1
+
 spring:
+  application:
+    name: product-service
+
   datasource:
     url: jdbc:postgresql://localhost:5432/productdb
     username: ${DB_USER}
@@ -16,15 +24,10 @@ spring:
         format_sql: true
         jdbc:
           time_zone: Asia/Kolkata
+
   rabbitmq:
     addresses: ${RABBIT_ADDRESS}
     connection-timeout: 30000
-
-
-server:
-  port: 8082
-  servlet:
-    context-path: /api/v1
 
 management:
   endpoints:
@@ -35,6 +38,18 @@ management:
     shutdown:
       enabled: true
 
-
 app:
   message: "Hello Product ms"
+
+---
+# ============ DOCKER PROFILE ============
+spring:
+  config:
+    activate:
+      on-profile: docker
+
+  datasource:
+    url: jdbc:postgresql://postgres:5432/productdb   # ✅ container name
+
+  rabbitmq:
+    addresses: rabbitmq:5672                         # ✅ container name

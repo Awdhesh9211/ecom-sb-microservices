@@ -1,17 +1,20 @@
-spring:
-  datasource:
-    mongodb:
-      uri: mongodb://localhost:27017/ms_ecom_userdb
-      database: ms_ecom_userdb
-  rabbitmq:
-    addresses: ${RABBIT_ADDRESS}
-    connection-timeout: 30000
-
-
 server:
   port: 8081
   servlet:
     context-path: /api/v1
+
+spring:
+  application:
+    name: user-service
+
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017/ms_ecom_userdb
+      database: ms_ecom_userdb
+
+  rabbitmq:
+    addresses: ${RABBIT_ADDRESS}
+    connection-timeout: 30000
 
 management:
   endpoints:
@@ -26,9 +29,28 @@ keycloak:
   admin:
     username: awdhesh9211
     password: admin
-    serveruri: http://localhost:8089
+    serveruri: http://localhost:8080
     realm: ecom-app
     clientId: admin-cli
 
 app:
   message: "Hello User ms"
+
+---
+# ============ DOCKER PROFILE ============
+spring:
+  config:
+    activate:
+      on-profile: docker
+
+  data:
+    mongodb:
+      uri: mongodb://mongo:27017/ms_ecom_userdb   # ✅ container name
+      database: ms_ecom_userdb
+
+  rabbitmq:
+    addresses: rabbitmq:5672                     # ✅ container name
+
+keycloak:
+  admin:
+    serveruri: http://keycloak:8080              # ✅ container name + correct port
