@@ -76,7 +76,7 @@ services:
       - pg_network
 
   mongo:
-    image: mongo:latest
+    image: mongo:7.0
     container_name: mongo
     restart: unless-stopped
     environment:
@@ -163,27 +163,35 @@ services:
     restart: unless-stopped
 
 # ======= APP SERVICES ====
-  configserver:
-    container_name: configserver
-    build:
-      context: ./configserver
-      dockerfile: Dockerfile
-    ports:
-      - "8888:8888"
-    environment:
-      TZ: Asia/Kolkata
-      SPRING_PROFILES_ACTIVE: docker
-      RABBIT_ADDRESS: rabbitmq:5672
-    depends_on:
-      - eureka-service
-    volumes:
-      - ./configserver/src/main/resources/config:/config
-    networks:
-      - pg_network
-    restart: unless-stopped
 
+#      // CONFIG SERVER 8888
+  configserver:
+   container_name: configserver
+   build:
+    context: ./configserver
+    dockerfile: Dockerfile
+   ports:
+    - "8888:8888"
+   environment:
+     - TZ=Asia/Kolkata
+     - SPRING_PROFILES_ACTIVE=docker
+     - RABBIT_ADDRESS=rabbitmq:5672
+     - SPRING_CLOUD_CONFIG_SERVER_NATIVE_SEARCH_LOCATIONS=file:/config/
+     - SPRING_CLOUD_CONFIG_SERVER_GIT_ENABLED=false
+     - SPRING_CLOUD_CONFIG_SERVER_COMPOSITE_ENABLED=false
+     - SPRING_CLOUD_CONFIG_SERVER_BOOTSTRAP=false
+   depends_on:
+    - eureka-service
+   volumes:
+    - ./configserver/src/main/resources/config:/config
+   networks:
+    - pg_network
+   restart: unless-stopped
+
+
+#  EUREKA SERVICE 8761
   eureka-service:
-    container_name: eureka_service
+    container_name: eureka-service
     build:
       context: ./eureka
       dockerfile: Dockerfile
@@ -197,7 +205,112 @@ services:
       - pg_network
     restart: unless-stopped
 
+#    //API GATEWAY
+  api-gateway:
+    container_name: api-gateway
+    build:
+      context: ./apigateway
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      TZ: Asia/Kolkata
+      SPRING_PROFILES_ACTIVE: docker
+    depends_on:
+      - eureka-service
+      - redis
+      - keycloak
+      - zipkin
+    networks:
+      - pg_network
+    restart: unless-stopped
 
+
+  #    // USER SERVICE 8081
+  user-service:
+    container_name: user-service
+    build:
+      context: ./userms
+      dockerfile: Dockerfile
+    ports:
+      - "8081:8081"
+    environment:
+      TZ: Asia/Kolkata
+      SPRING_PROFILES_ACTIVE: docker
+      RABBIT_ADDRESS: rabbitmq:5672
+      SPRING_DATA_MONGODB_URI: mongodb://mongo:27017/ms_ecom_userdb
+    depends_on:
+      - mongo
+      - rabbitmq
+      - keycloak
+      - eureka-service
+    networks:
+      - pg_network
+    restart: unless-stopped
+
+#    // PRODUCT SERVICE 8082
+  product-service:
+    container_name: product-service
+    build:
+      context: ./productms
+      dockerfile: Dockerfile
+    ports:
+      - "8082:8082"
+    environment:
+      TZ: Asia/Kolkata
+      SPRING_PROFILES_ACTIVE: docker
+      RABBIT_ADDRESS: rabbitmq:5672
+      DB_USER: postgres
+      DB_PASS: postgres
+    depends_on:
+      - postgres
+      - rabbitmq
+      - eureka-service
+    networks:
+      - pg_network
+    restart: unless-stopped
+
+#   // ORDER SERVICE 8083
+  order-service:
+    container_name: order-service
+    build:
+      context: ./orderms
+      dockerfile: Dockerfile
+    ports:
+      - "8083:8083"
+    environment:
+      TZ: Asia/Kolkata
+      SPRING_PROFILES_ACTIVE: docker
+      RABBIT_ADDRESS: rabbitmq:5672
+      DB_USER: postgres
+      DB_PASS: postgres
+    depends_on:
+      - postgres
+      - rabbitmq
+      - kafka
+      - eureka-service
+      - zipkin
+    networks:
+      - pg_network
+    restart: unless-stopped
+
+#  // NOTIFICATION SERVICE 8084
+  notification-service:
+    container_name: notification-service
+    build:
+      context: ./notification
+      dockerfile: Dockerfile
+    ports:
+      - "8084:8084"
+    environment:
+      TZ: Asia/Kolkata
+      SPRING_PROFILES_ACTIVE: docker
+    depends_on:
+      - kafka
+      - eureka-service
+    networks:
+      - pg_network
+    restart: unless-stopped
 
 
 

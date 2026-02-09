@@ -1,29 +1,16 @@
 server:
-  port: 8082
+  port: 8081
   servlet:
     context-path: /api/v1
 
 spring:
   application:
-    name: product-service
+    name: user-service
 
-  datasource:
-    url: jdbc:postgresql://localhost:5432/productdb
-    username: ${DB_USER}
-    password: ${DB_PASS}
-    driver-class-name: org.postgresql.Driver
-
-  jpa:
-    database: postgresql
-    database-platform: org.hibernate.dialect.PostgreSQLDialect
-    hibernate:
-      ddl-auto: update
-    show-sql: true
-    properties:
-      hibernate:
-        format_sql: true
-        jdbc:
-          time_zone: Asia/Kolkata
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017/ms_ecom_userdb
+      database: ms_ecom_userdb
 
   rabbitmq:
     addresses: ${RABBIT_ADDRESS}
@@ -38,18 +25,34 @@ management:
     shutdown:
       enabled: true
 
+keycloak:
+  admin:
+    username: awdhesh9211
+    password: admin
+    serveruri: http://localhost:8080
+    realm: ecom-app
+    clientId: admin-cli
+
 app:
-  message: "Hello Product ms"
+  message: "Hello User ms"
 
 ---
-# ============ DOCKER PROFILE ============
+# ================= DOCKER PROFILE =================
+
 spring:
   config:
     activate:
       on-profile: docker
 
-  datasource:
-    url: jdbc:postgresql://postgres:5432/productdb   # ✅ container name
+  data:
+    mongodb:
+      uri: mongodb://mongo:27017/ms_ecom_userdb   # container name
+      database: ms_ecom_userdb
 
   rabbitmq:
-    addresses: rabbitmq:5672                         # ✅ container name
+    addresses: rabbitmq:5672                     # container name
+    connection-timeout: 30000
+
+keycloak:
+  admin:
+    serveruri: http://keycloak:8080              # container name

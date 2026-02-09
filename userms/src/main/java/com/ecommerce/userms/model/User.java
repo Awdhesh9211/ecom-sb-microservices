@@ -2,23 +2,24 @@ package com.ecommerce.userms.model;
 
 
 import com.ecommerce.userms.enumclass.UserRole;
-import jakarta.persistence.*;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
-
+import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.time.LocalDateTime;
-
 
 @Document(collection = "users")
 public class User {
 
     @Id
     private String id;
-    @Column(unique = true, nullable = false)
+
+    @Indexed(unique = true)
     private String username;
+
     private String password;
     private String keycloakId;
     private String firstName;
@@ -26,19 +27,23 @@ public class User {
 
     @Indexed(unique = true)
     private String email;
+
     private String phone;
-    private UserRole role=UserRole.CUSTOMER;
+    private UserRole role = UserRole.CUSTOMER;
     private Address address;
 
-    // Created AT(when create) and Updated AT(last update)
-    @CreationTimestamp
+    // ✅ CORRECT for Mongo
+    @CreatedDate
+    @Field("created_at")
     private LocalDateTime createdAt;
-    @UpdateTimestamp
+
+    @LastModifiedDate
+    @Field("updated_at")
     private LocalDateTime updatedAt;
 
-
-    // DEFAULT CONSTRUCTOR
     public User() {}
+
+    // getters/setters (same as yours)
 
     // GETTER AND SETTTER
     public String getId() {return id;}

@@ -228,7 +228,7 @@ eureka:
   client:
     serviceUrl:
       # inside docker, use eureka container name
-      defaultZone: http://eureka_service:8761/eureka
+      defaultZone: http://eureka-service:8761/eureka
 
 management:
   zipkin:
