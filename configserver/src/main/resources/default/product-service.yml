@@ -1,0 +1,45 @@
+#spring:
+#  application:
+#    name: product-service
+
+
+#    DEFAULT
+
+#  datasource:
+#    url: jdbc:postgresql://localhost:5432/productdb
+#    username: ${DB_USER}
+#    password: ${DB_PASS}
+#    driver-class-name: org.postgresql.Driver
+#    # JPA
+#  jpa:
+#    database: postgresql
+#    database-platform: org.hibernate.dialect.PostgreSQLDialect
+#    hibernate:
+#        ddl-auto: update
+#    show-sql: true
+#    properties:
+#      hibernate:
+#        format_sql: true
+#        jdbc:
+#          time_zone: Asia/Kolkata
+#
+#  rabbitmq:
+#    addresses: ${RABBIT_ADDRESS}
+#    connection-timeout: 30000
+#
+#management:
+#  endpoints:
+#    web:
+#      exposure:
+#        include: "*"
+#  endpoint:
+#    shutdown:
+#      enabled: true
+#
+#server:
+#  port: 8081
+#  servlet:
+#    context-path: /api/v1
+#
+#app:
+#  message: "Hello Product ms"

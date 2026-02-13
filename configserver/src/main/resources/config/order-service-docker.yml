@@ -1,0 +1,156 @@
+server:
+  port: 8083
+  servlet:
+    context-path: /api/v1
+
+spring:
+  application:
+    name: order-service
+
+  datasource:
+    url: jdbc:postgresql://postgres:5432/orderdb
+    username: ${DB_USER}
+    password: ${DB_PASS}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    database: postgresql
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        jdbc:
+          time_zone: Asia/Kolkata
+
+  rabbitmq:
+    addresses: rabbitmq:5672
+    connection-timeout: 30000
+
+  cloud:
+    bus:
+      enabled: true
+      destination: springCloudBus
+
+    stream:
+      default-binder: kafka
+
+      bindings:
+        createOrder-out-0:
+          destination: order.exchange
+          content-type: application/json
+
+        springCloudBus-out-0:
+          binder: rabbit
+
+        springCloudBus-in-0:
+          binder: rabbit
+
+      kafka:
+        binder:
+          brokers: kafka:9092
+
+management:
+  health:
+    circuitbreakers:
+      enabled: true
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    shutdown:
+      enabled: true
+    health:
+      show-details: always
+  tracing:
+    sampling:
+      probability: 1.0
+  zipkin:
+    tracing:
+      endpoint: http://zipkin:9411/api/v2/spans
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://eureka-service:8761/eureka
+
+logging:
+  level:
+    root: INFO
+    com.ecommerce.orderms: DEBUG
+    com.ecommerce.orderms.service.impl: DEBUG
+    com.ecommerce.orderms.controller: DEBUG
+    io.github.resilience4j: DEBUG
+    io.github.resilience4j.retry: DEBUG
+    io.github.resilience4j.circuitbreaker: DEBUG
+    org.springframework.web.client.RestTemplate: DEBUG
+
+  file:
+    name: logs/order-service.log
+    max-size: 10MB
+    max-history: 10
+
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} | %-5level | [%thread] | %logger{40} | %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss.SSS} | %-5level | [%thread] | %logger{50} | %msg%n"
+
+resilience4j:
+  retry:
+    instances:
+      retryService:
+        max-attempts: 4
+        wait-duration: 2000ms
+        enable-exponential-backoff: true
+        exponential-backoff-multiplier: 2
+        retry-exceptions:
+          - java.lang.IllegalStateException
+
+  circuitbreaker:
+    configs:
+      default:
+        registerHealthIndicator: true
+        slidingWindowType: COUNT_BASED
+        slidingWindowSize: 10
+        minimumNumberOfCalls: 5
+        failureRateThreshold: 50
+        slowCallRateThreshold: 100
+        slowCallDurationThreshold: 3s
+        waitDurationInOpenState: 10s
+        permittedNumberOfCallsInHalfOpenState: 3
+        automaticTransitionFromOpenToHalfOpenEnabled: true
+
+    instances:
+      productService:
+        baseConfig: default
+        slidingWindowSize: 10
+        minimumNumberOfCalls: 5
+        failureRateThreshold: 50
+        waitDurationInOpenState: 10s
+
+      userService:
+        baseConfig: default
+        slidingWindowSize: 8
+        minimumNumberOfCalls: 4
+        failureRateThreshold: 50
+        waitDurationInOpenState: 8s
+
+  ratelimiter:
+    instances:
+      retryLimiter:
+        timeout-duration: 0
+        limit-refresh-period: 4s
+        limit-for-period: 2
+
+app:
+  message: "Hello Order Service"
+
+  retry:
+    product-service:
+      max-attempts: 4
+      backoff-ms: 500
+    user-service:
+      max-attempts: 4
+      backoff-ms: 500

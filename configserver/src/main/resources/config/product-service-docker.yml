@@ -1,0 +1,73 @@
+spring:
+  application:
+    name: product-service
+
+  datasource:
+    url: jdbc:postgresql://postgres:5432/productdb
+    username: ${DB_USER}
+    password: ${DB_PASS}
+    driver-class-name: org.postgresql.Driver
+    # JPA
+  jpa:
+    database: postgresql
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        jdbc:
+          time_zone: Asia/Kolkata
+
+  rabbitmq:
+    addresses: rabbitmq:5672                     # container name
+    connection-timeout: 30000
+    # container name
+
+server:
+  port: 8082
+  servlet:
+    context-path: /api/v1
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    shutdown:
+      enabled: true
+  tracing:
+    sampling:
+      probability: 1.0   # 100% sampling (use lower in prod)
+  zipkin:
+    tracing:
+      endpoint: http://zipkin:9411/api/v2/spans
+
+
+logging:
+  level:
+    root: INFO
+    com.ecommerce.userms: TRACE
+  file:
+    name: logs/product-service.log
+  pattern:
+    console: |
+
+
+      ------START--------
+      TIME  : %d{yyyy-MM-dd HH:mm:ss}
+      LEVEL : %-5level
+      PATH  : %logger
+      MSG   : %msg
+      -----END-----------
+
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://eureka-service:8761/eureka
+
+app:
+  message: "Hello Product ms"

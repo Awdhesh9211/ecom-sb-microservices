@@ -10,6 +10,7 @@ services:
       PGDATA: /var/lib/postgresql/data
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - ./init-multi-db.sql:/docker-entrypoint-initdb.d/init.sql
     ports:
       - "5432:5432"
     networks:
@@ -114,7 +115,7 @@ services:
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
 
       KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT
 
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
@@ -166,28 +167,30 @@ services:
 
 #      // CONFIG SERVER 8888
   configserver:
-   container_name: configserver
-   build:
-    context: ./configserver
-    dockerfile: Dockerfile
-   ports:
-    - "8888:8888"
-   environment:
-     - TZ=Asia/Kolkata
-     - SPRING_PROFILES_ACTIVE=docker
-     - RABBIT_ADDRESS=rabbitmq:5672
-     - SPRING_CLOUD_CONFIG_SERVER_NATIVE_SEARCH_LOCATIONS=file:/config/
-     - SPRING_CLOUD_CONFIG_SERVER_GIT_ENABLED=false
-     - SPRING_CLOUD_CONFIG_SERVER_COMPOSITE_ENABLED=false
-     - SPRING_CLOUD_CONFIG_SERVER_BOOTSTRAP=false
-   depends_on:
-    - eureka-service
-   volumes:
-    - ./configserver/src/main/resources/config:/config
-   networks:
-    - pg_network
-   restart: unless-stopped
-
+    container_name: configserver
+    build:
+      context: ./configserver
+      dockerfile: Dockerfile
+    ports:
+      - "8888:8888"
+    environment:
+      TZ: Asia/Kolkata
+      SPRING_PROFILES_ACTIVE: native
+      RABBIT_ADDRESS: rabbitmq:5672
+      JAVA_OPTS: |
+        -Dspring.profiles.active=native
+        -Dserver.port=8888
+        -Dspring.cloud.config.server.native.enabled=true
+        -Dspring.cloud.config.server.native.search-locations=file:/config/
+        -Dspring.cloud.config.server.git.enabled=false
+        -Dspring.cloud.config.server.bootstrap=false
+    depends_on:
+      - eureka-service
+    volumes:
+      - "D:/18_UDEMY/SPRING_BOOT_MICROSERVICES/ecom-app-ms/configserver/src/main/resources/config:/config"
+    networks:
+      - pg_network
+    restart: unless-stopped
 
 #  EUREKA SERVICE 8761
   eureka-service:
